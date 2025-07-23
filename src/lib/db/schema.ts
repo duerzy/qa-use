@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import { integer, pgEnum, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 
 export const suite = pgTable('suite', {
@@ -53,3 +54,23 @@ export const testStep = pgTable('test_step', {
    */
   description: text('description').notNull(),
 })
+
+// Relations
+export const suiteRelations = relations(suite, ({ many }) => ({
+  tests: many(test),
+}))
+
+export const testRelations = relations(test, ({ one, many }) => ({
+  suite: one(suite, {
+    fields: [test.suiteId],
+    references: [suite.id],
+  }),
+  steps: many(testStep),
+}))
+
+export const testStepRelations = relations(testStep, ({ one }) => ({
+  test: one(test, {
+    fields: [testStep.testId],
+    references: [test.id],
+  }),
+}))

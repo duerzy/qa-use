@@ -1,7 +1,7 @@
 import { createTest, TestDefinition, TestSuiteDefinition } from './engine'
 
 export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
-  label: 'Skyscanner Search',
+  label: 'Passing Skyscanner Search',
   task: 'Validate that you can create a new flight search on skyscanner.com',
   steps: [
     'Go to skyscanner.com',
@@ -17,7 +17,7 @@ export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
 })
 
 export const SKYSCANNER_FAILING_SEARCH_TEST: TestDefinition = createTest({
-  label: 'Skyscanner Search',
+  label: 'Failing Skyscanner Search',
   task: 'Validate that you can create a new flight search on skyscanner.com',
   steps: [
     'Go to skyscanner.com',
