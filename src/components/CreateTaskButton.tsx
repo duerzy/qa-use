@@ -65,7 +65,12 @@ export function CreateTaskButton({ onTaskCreated }: { onTaskCreated?: () => void
 
   return (
     <div className="flex flex-col gap-2">
-      <Button onClick={handleCreateTask} disabled={creating || !apiKey.trim() || !mounted} className="px-4 py-2">
+      <Button
+        onClick={handleCreateTask}
+        disabled={creating || !apiKey.trim() || !mounted}
+        className="px-4 py-2"
+        formAction={}
+      >
         {creating ? 'Creating Task...' : 'Create Test Task'}
       </Button>
       {error && <p className="text-red-600 text-xs">{error}</p>}
