@@ -36,6 +36,6 @@ export const SKYSCANNER_TEST_SUITE: TestSuiteDefinition = {
   tests: [
     //
     SKYSCANNER_PASSING_SEARCH_TEST,
-    SKYSCANNER_FAILING_SEARCH_TEST,
+    // SKYSCANNER_FAILING_SEARCH_TEST,
   ],
 }

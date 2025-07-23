@@ -45,7 +45,7 @@ export function SuiteList({ data }: { data: TPageData }) {
         const isExpanded = expandedSuites.has(suite.id)
 
         return (
-          <div key={suite.id} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div key={suite.id} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
             {/* Suite Header */}
             <button
               onClick={() => toggleSuite(suite.id)}
