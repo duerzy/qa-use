@@ -1,18 +1,21 @@
-'use client'
-
-import { ApiKeyInput } from '@/components/ApiKeyInput'
-import { CreateTaskButton } from '@/components/CreateTaskButton'
-import { TaskFilter } from '@/components/TaskFilter'
 import { TaskGrid } from '@/components/TaskGrid'
-import { useTasks } from '@/hooks/useTasks'
+import { client } from '@/lib/api/client'
 
-export default function Home() {
-  const { filteredTasks, loading, error, filter, setFilter, refetch } = useTasks()
+async function getUserBalance() {
+  const response = await client.GET('/api/v1/balance')
 
-  const handleTaskCreated = () => {
-    // Refresh the task list after creating a new task
-    refetch()
-  }
+  return response.data
+}
+
+export default async function Home() {
+  const balance = await getUserBalance()
+
+  // const { filteredTasks, loading, error, filter, setFilter, refetch } = useTasks()
+
+  // const handleTaskCreated = () => {
+  //   // Refresh the task list after creating a new task
+  //   refetch()
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -24,13 +27,14 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">Task Dashboard</h1>
               <p className="text-gray-600 text-sm mt-1">Monitor and manage your browser automation tasks</p>
             </div>
-            <ApiKeyInput />
+            <p>Balance: {balance?.balance}</p>
           </div>
 
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          {/* <div className="flex items-center justify-between flex-wrap gap-4">
             <TaskFilter currentFilter={filter} onFilterChange={setFilter} />
             <div className="flex items-center gap-3">
               <CreateTaskButton onTaskCreated={handleTaskCreated} />
+
               {!loading && (
                 <button
                   onClick={refetch}
@@ -41,11 +45,10 @@ export default function Home() {
                 </button>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
-
         {/* Tasks Grid */}
-        <TaskGrid tasks={filteredTasks} loading={loading} error={error} />
+        {/* <TaskGrid tasks={filteredTasks} loading={loading} error={error} /> */}
       </div>
     </div>
   )

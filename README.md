@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Use QA
 
-## Getting Started
+E2E QA testing example using BrowserUse, showcasing as many features of BrowserUse as possible, having a copy-pastable code that can easily be reused.
 
-First, run the development server:
+# Set Up
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone
+get api key
+docker compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Guide
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Get something working quickly after that!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The core idea is to have a copy-pastable project that can be used as a spring-board for companies building internal tools with BrowserUse.
 
-## Learn More
+1. Automation flow that finds important parts of the application.
+1. List of all tests (grouped by function or by url)
+1. List of runs (suites) with lots of live video screens.
+1. Test Run View (with time travel)
+1. Use Scheduled Tasks to track state
+1. Webhook? idk... could be annoying for local set-up because you need routing
+1. Add thinking step
+1. Using WorkflowUse vs reusing WorkflowUse in the code to get it up and running.
 
-To learn more about Next.js, take a look at the following resources:
+## Constraints
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- no login screen
+- easy docker spin up
+- copy-pasteable code
+- only runs locally (auth, db etc. second iteration)
+- only use cloud, do not use browser-use python library
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development Setup
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+docker compose up --watch
+```
