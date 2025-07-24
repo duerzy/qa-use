@@ -75,7 +75,7 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
         </div>
       </div>
 
-      <Polling poll={run.status === 'running'} />
+      <Polling poll={run.status === 'running' || run.status === 'pending'} />
     </div>
   )
 }
