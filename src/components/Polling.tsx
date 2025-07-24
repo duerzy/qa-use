@@ -1,33 +1,43 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef } from 'react'
 
-function useTaskPolling() {
-  const pollRunningTests = useCallback(async () => {
-    try {
-    } catch (error) {
-      console.error('Error polling running tests:', error)
+export function useTaskPolling({ run, interval = 2000 }: { run: boolean; interval?: number }) {
+  const router = useRouter()
+  const isRunning = useRef(true)
+
+  const poll = useCallback(async () => {
+    if (isRunning.current) {
+      router.refresh() // triggers a full fetch/re-render
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
-    // Poll immediately on mount
-    pollRunningTests()
+    poll()
 
-    // Set up polling interval
-    const interval = setInterval(pollRunningTests, 2000) // 2 seconds
+    if (!run) {
+      isRunning.current = false
+      return
+    }
 
-    return () => clearInterval(interval)
-  }, [pollRunningTests])
+    isRunning.current = true
 
-  return { pollRunningTests }
+    const id = setInterval(poll, interval)
+
+    return () => {
+      isRunning.current = false
+      clearInterval(id)
+    }
+  }, [poll, interval, run])
+
+  return null
 }
-
 /**
  * Polls for running tests and updates their status.
  */
-export function Polling() {
-  useTaskPolling()
+export function Polling({ poll }: { poll: boolean }) {
+  useTaskPolling({ run: poll })
 
   return null
 }

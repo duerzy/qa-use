@@ -1,7 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Suspense } from 'react'
 
-import { Polling } from '@/components/Polling'
 import { SuiteList } from '@/components/SuiteList'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,7 +27,12 @@ export default async function Page() {
           <h1 className="text-5xl font-bold text-gray-900 mr-auto">QA-Use</h1>
 
           <CreateSuiteDialog />
-          <Button variant="outline" formAction={seedSuiteAction}></Button>
+
+          <form action={seedSuiteAction}>
+            <Button variant="outline" type="submit">
+              Seed
+            </Button>
+          </form>
         </div>
 
         {/* Suites List */}
@@ -38,8 +42,6 @@ export default async function Page() {
             <SuiteList data={suites} />
           </Suspense>
         </div>
-
-        <Polling />
       </div>
     </div>
   )

@@ -7,8 +7,8 @@ export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',
-    'Type in Zurich as departure location.',
-    'Type in Ljubljana as destination.',
+    'Select Zurich as departure location.',
+    'Select Ljubljana as destination.',
     'Pick flight date to be tomorrow.',
     'Select one passenger option and click apply',
     'Click search',
@@ -23,8 +23,8 @@ export const SKYSCANNER_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',
-    'Type in Zurich as departure location.',
-    'Type in Ljubljana as destination.',
+    'Select Zurich as departure location.',
+    'Select Ljubljana as destination.',
     'Pick flight date to be tomorrow.',
     'Select one passenger option and click apply',
     'Click search',
@@ -38,8 +38,8 @@ export const SKYSCANNER_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',
-    'Type in Zurich as departure location.',
-    'Type in moon as destination.',
+    'Select Zurich as departure location.',
+    'Select moon as destination.',
     'Pick flight date to be tomorrow.',
     'Select one passenger option and click apply',
     'Click search',

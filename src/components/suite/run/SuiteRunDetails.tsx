@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 
 import type { TSuiteRun } from '@/app/suite/[suiteId]/run/[suiteRunId]/loader'
+import { Polling } from '@/components/Polling'
 
 export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
   function formatDate(date: Date | string) {
@@ -73,6 +74,8 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
           </div>
         </div>
       </div>
+
+      <Polling poll={run.status === 'running'} />
     </div>
   )
 }

@@ -67,4 +67,7 @@ export async function seedSuiteAction() {
       })
     }
   }
+
+  revalidatePath('/')
+  redirect(`/`)
 }

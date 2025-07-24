@@ -5,7 +5,7 @@ export const zResponse = z.object({
   steps: z
     .array(
       z.object({
-        id: z.number(),
+        id: z.string(),
         description: z.string(),
       }),
     )

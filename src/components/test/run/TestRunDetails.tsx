@@ -4,6 +4,7 @@ import { ArrowLeft, Monitor } from 'lucide-react'
 import Link from 'next/link'
 
 import type { TTestRun } from '@/app/suite/[suiteId]/test/[testId]/run/[testRunId]/loader'
+import { Polling } from '@/components/Polling'
 import { Button } from '@/components/ui/button'
 
 export function TestRunDetails({ run }: { run: TTestRun }) {
@@ -90,6 +91,8 @@ export function TestRunDetails({ run }: { run: TTestRun }) {
           </div>
         </div>
       </div>
+
+      <Polling poll={status === 'running'} />
     </div>
   )
 }

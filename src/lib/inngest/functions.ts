@@ -107,7 +107,7 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
       enable_public_share: true,
       save_browser_data: false,
       task: getTaskPrompt(definition),
-      llm_model: 'gpt-4o-mini',
+      llm_model: 'o4-mini',
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
@@ -197,7 +197,8 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
               .where(eq(schema.testRun.id, dbTestRun.id))
 
             for (const step of dbTestRun.testRunSteps) {
-              const passed = taskResult.steps?.find((s) => s.id === step.stepId)
+              // TODO: Unify step ID types!
+              const passed = taskResult.steps?.find((s) => s.id === `${step.stepId}`)
 
               await tx
                 .update(schema.testRunStep)
