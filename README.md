@@ -5,9 +5,14 @@ E2E QA testing example using BrowserUse, showcasing as many features of BrowserU
 # Set Up
 
 ```bash
-git clone
-get api key
-docker compose up -d
+# Clone repository
+git clone git@github.com:browser-use/use-qa.git
+
+# Copy Environment Variables and Fill API Key
+cp .env.example .env
+
+# Start
+docker compose up
 ```
 
 # Guide
