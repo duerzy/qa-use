@@ -175,6 +175,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
               })
               .where(eq(schema.testRun.id, dbTestRun.id))
 
+            // NOTE: Here we update all steps at once and mark them as passed.
             await tx
               .update(schema.testRunStep)
               .set({
@@ -196,6 +197,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
               })
               .where(eq(schema.testRun.id, dbTestRun.id))
 
+            // NOTE: We manually check each step to see if it was performed as expected.
             for (const step of dbTestRun.testRunSteps) {
               // TODO: Unify step ID types!
               const passed = taskResult.steps?.find((s) => s.id === `${step.stepId}`)
@@ -205,12 +207,12 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
                 .set({
                   status: passed ? 'passed' : 'failed',
                 })
-                .where(eq(schema.testRunStep.testRunId, dbTestRun.id))
+                .where(eq(schema.testRunStep.id, step.id))
             }
           })
         }
 
-        return { ok: true }
+        return { ok: true, data: buTaskResponse.data.output }
       }
 
       case 'running':
@@ -241,6 +243,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
 
         return {
           ok: false,
+          data: buTaskResponse.data.output,
         }
       }
 

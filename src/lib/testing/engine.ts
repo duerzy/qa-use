@@ -96,6 +96,7 @@ You'll be given a task description, steps, and success criteria. You need to
 
 - Perform the steps in the exact order they are given.
 - Do not search for potential fixes or workarounds.
+- Keep explicit track (e.g. in a list) of the steps you have performed in your actions.
 
 
 # Success and Failure Criteria for Steps
@@ -120,6 +121,12 @@ For example:
 
 # Response Format
 
+Return a JSON object with the following format:
+
+\`\`\`json
+${JSON.stringify(RESPONSE_JSON_SCHEMA, null, 2)}
+\`\`\`
+
 Return \`{ status: "pass", steps: undefined, error: undefined }\` if you can successfully perform the task.
 
 Return \`{ status: "failing", steps: [ { id: <number>, description: "<action that was taken>" } ], error: "<error message>" }\` if you cannot successfully perform the test. The steps array contains exactly the steps that were successfully performed and nothing more. If you cannot perform a step, the error message contains information about why the step failed. If the final state does not match the success criteria, the error message is a detailed short description explaining what is different on the actual application compared to the expected application state and success criteria.
@@ -129,6 +136,7 @@ Additionally:
 - DO NOT INCLUDE ANY OTHER TEXT IN YOUR RESPONSE.
 - CORRECTLY CHOOSE THE ID FOR EACH STEP.
 - STEPS NEED TO BE RETURNED IN THE EXACT ORDER THEY WERE GIVEN.
+- STRICTLY FOLLOW THE RESPONSE FORMAT DEFINED ABOVE!
 
 # Prompt Format
 
@@ -182,6 +190,8 @@ The task will be given in the following format:
 \`\`\`
 { "status": "failing", "steps": [ { "id": "1", "description": "Go to the search page" } ], "error": "The search page is not found" }
 \`\`\`
+
+
 `
 
 function stringifyTest(test: TestDefinition) {
