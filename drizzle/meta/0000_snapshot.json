@@ -1,5 +1,5 @@
 {
-  "id": "fc17544e-5bcb-4304-8356-6287f336b777",
+  "id": "3d9e5c8a-add3-48ee-a684-71ee2cad865e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -85,7 +85,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -149,7 +149,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -212,6 +212,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "public_share_url": {
+          "name": "public_share_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -226,7 +232,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "test_run_suite_run_id_suite_run_id_fk": {
@@ -239,7 +245,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -273,10 +279,10 @@
         },
         "status": {
           "name": "status",
-          "type": "test_run_step_status",
+          "type": "run_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -291,7 +297,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "test_run_step_step_id_test_step_id_fk": {
@@ -304,12 +310,21 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "test_run_step_unique": {
+          "name": "test_run_step_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "test_run_id",
+            "step_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -335,7 +350,7 @@
           "name": "test_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "order": {
           "name": "order",
@@ -362,7 +377,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -382,15 +397,6 @@
         "running",
         "passed",
         "failed"
-      ]
-    },
-    "public.test_run_step_status": {
-      "name": "test_run_step_status",
-      "schema": "public",
-      "values": [
-        "passed",
-        "failed",
-        "skipped"
       ]
     }
   },

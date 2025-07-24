@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { NonRetriableError, RetryAfterError } from 'inngest'
 
 import { client } from '../api/client'
@@ -63,26 +63,9 @@ export const runTestSuite = inngest.createFunction(
       step.run(`complete-test-run-${testRunId}`, _pollTaskUntilFinished, { testRunId }),
     )
 
-    const results = await Promise.all(timeouts)
+    await Promise.all(timeouts)
 
-    await step.run(`finalize-suite-run`, async () => {
-      const dbSuiteRun = await db.query.suiteRun.findFirst({
-        where: eq(schema.suiteRun.id, event.data.suiteRunId),
-      })
-
-      if (!dbSuiteRun) {
-        throw new NonRetriableError(`Suite run not found: ${event.data.suiteRunId}`, {
-          cause: 'Suite run not found',
-        })
-      }
-
-      const hasFailed = results.some((result) => !result.ok)
-
-      await db
-        .update(schema.suiteRun)
-        .set({ status: hasFailed ? 'failed' : 'passed' })
-        .where(eq(schema.suiteRun.id, event.data.suiteRunId))
-    })
+    await step.run(`finalize-suite-run`, _finalizeSuiteRun, { suiteId: event.data.suiteRunId, testRunIds })
   },
 )
 
@@ -102,10 +85,12 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
     },
   })
 
+  if (dbTestRun?.browserUseId != null) {
+    return dbTestRun.id
+  }
+
   if (!dbTestRun) {
-    throw new NonRetriableError(`Test run not found: ${testRunId}`, {
-      cause: 'Test run not found',
-    })
+    throw new NonRetriableError(`Test run not found: ${testRunId}`)
   }
 
   const definition: TestDefinition = {
@@ -119,14 +104,14 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
   const buTaskResponse = await client.POST('/api/v1/run-task', {
     body: {
       highlight_elements: false,
-      enable_public_share: false,
+      enable_public_share: true,
       save_browser_data: false,
       task: getTaskPrompt(definition),
       llm_model: 'gpt-4o-mini',
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
-      allowed_domains: [dbTestRun.test.suite.domain],
+      // allowed_domains: [dbTestRun.test.suite.domain],
       structured_output_json: JSON.stringify(RESPONSE_JSON_SCHEMA),
     },
   })
@@ -153,18 +138,17 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
   while (true) {
     const dbTestRun = await db.query.testRun.findFirst({
       where: eq(schema.testRun.id, testRunId),
+      with: {
+        testRunSteps: true,
+      },
     })
 
     if (!dbTestRun) {
-      throw new NonRetriableError(`Test run not found: ${testRunId}`, {
-        cause: 'Test run not found',
-      })
+      throw new NonRetriableError(`Test run not found: ${testRunId}`)
     }
 
     if (!dbTestRun.browserUseId) {
-      throw new NonRetriableError(`Test run not started: ${testRunId}`, {
-        cause: 'Test run not started',
-      })
+      throw new NonRetriableError(`Test run not started: ${testRunId}`)
     }
 
     const buTaskResponse = await client.GET('/api/v1/task/{task_id}', {
@@ -172,31 +156,57 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
     })
 
     if (buTaskResponse.error || !buTaskResponse.data) {
-      throw new RetryAfterError('Failed to get task status', 1_000)
+      throw new RetryAfterError('Failed to get task status, retrying...', 1_000)
     }
-
-    console.log(buTaskResponse.data)
 
     switch (buTaskResponse.data.status) {
       case 'finished': {
         const taskResult = getTaskResponse(buTaskResponse.data.output)
 
-        if (!taskResult) {
-          throw new NonRetriableError('Failed to get task result', { cause: 'Failed to get task result' })
-        }
-
         if (taskResult.status === 'pass') {
-          await db
-            .update(schema.testRun)
-            .set({ status: 'passed', error: null })
-            .where(eq(schema.testRun.id, dbTestRun.id))
+          await db.transaction(async (tx) => {
+            await tx
+              .update(schema.testRun)
+              .set({
+                status: 'passed',
+                error: null,
+                publicShareUrl: buTaskResponse.data.public_share_url,
+                liveUrl: buTaskResponse.data.live_url,
+              })
+              .where(eq(schema.testRun.id, dbTestRun.id))
+
+            await tx
+              .update(schema.testRunStep)
+              .set({
+                status: 'passed' as const,
+              })
+              .where(eq(schema.testRunStep.testRunId, dbTestRun.id))
+          })
         }
 
         if (taskResult.status === 'failing') {
-          await db
-            .update(schema.testRun)
-            .set({ status: 'failed', error: taskResult.error })
-            .where(eq(schema.testRun.id, dbTestRun.id))
+          await db.transaction(async (tx) => {
+            await tx
+              .update(schema.testRun)
+              .set({
+                status: 'failed',
+                error: taskResult.error,
+                publicShareUrl: buTaskResponse.data.public_share_url,
+                liveUrl: buTaskResponse.data.live_url,
+              })
+              .where(eq(schema.testRun.id, dbTestRun.id))
+
+            for (const step of dbTestRun.testRunSteps) {
+              const passed = taskResult.steps?.find((s) => s.id === step.stepId)
+
+              await tx
+                .update(schema.testRunStep)
+                .set({
+                  status: passed ? 'passed' : 'failed',
+                })
+                .where(eq(schema.testRunStep.testRunId, dbTestRun.id))
+            }
+          })
         }
 
         return { ok: true }
@@ -209,6 +219,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
             .update(schema.testRun)
             .set({
               liveUrl: buTaskResponse.data.live_url,
+              publicShareUrl: buTaskResponse.data.public_share_url,
             })
             .where(eq(schema.testRun.id, dbTestRun.id))
         }
@@ -236,4 +247,19 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
         throw new ExhaustiveSwitchCheck(buTaskResponse.data.status)
     }
   }
+}
+
+async function _finalizeSuiteRun({ suiteId, testRunIds }: { suiteId: number; testRunIds: number[] }) {
+  const dbTestRuns = await db.query.testRun.findMany({
+    where: inArray(schema.suiteRun.id, testRunIds),
+  })
+
+  const hasFailed = dbTestRuns.some((result) => result.status === 'failed')
+
+  await db
+    .update(schema.suiteRun)
+    .set({ status: hasFailed ? 'failed' : 'passed' })
+    .where(eq(schema.suiteRun.id, suiteId))
+
+  return { hasFailed }
 }

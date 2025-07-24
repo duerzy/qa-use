@@ -47,7 +47,11 @@ export async function runSuiteAction(suiteId: number, _: FormData) {
         .returning()
 
       for (const step of test.steps) {
-        await tx.insert(schema.testRunStep).values({ testRunId: newTestRun.id, stepId: step.id })
+        await tx.insert(schema.testRunStep).values({
+          testRunId: newTestRun.id,
+          stepId: step.id,
+          status: 'pending',
+        })
       }
     }
 
@@ -95,4 +99,11 @@ export async function createTestAction(suiteId: number, formData: FormData) {
 
   revalidatePath(`/suite/${suiteId}`)
   redirect(`/suite/${suiteId}/test/${newTest.id}`, RedirectType.push)
+}
+
+export async function deleteSuiteAction(suiteId: number) {
+  await db.delete(schema.suite).where(eq(schema.suite.id, suiteId))
+
+  revalidatePath('/')
+  redirect('/', RedirectType.push)
 }

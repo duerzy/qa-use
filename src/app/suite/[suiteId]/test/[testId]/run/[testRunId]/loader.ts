@@ -7,6 +7,11 @@ export async function loader(suiteId: number, testRunId: number) {
   const testRun = await db.query.testRun.findFirst({
     where: eq(schema.testRun.id, testRunId),
     with: {
+      testRunSteps: {
+        with: {
+          testStep: true,
+        },
+      },
       test: {
         with: {
           steps: true,

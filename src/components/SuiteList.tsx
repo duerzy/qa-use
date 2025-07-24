@@ -3,19 +3,9 @@
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
-import type { TPageData } from '@/app/page'
+import type { TPageData } from '@/app/loader'
 
 export function SuiteList({ data }: { data: TPageData }) {
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date)
-  }
-
   if (data.length === 0) {
     return (
       <div className="text-center py-12">
@@ -37,7 +27,9 @@ export function SuiteList({ data }: { data: TPageData }) {
             <div className="flex items-center gap-4">
               <div className="text-left">
                 <h3 className="font-semibold text-gray-900">{suite.name}</h3>
-                <p className="text-sm text-gray-500">{formatDate(suite.createdAt)}</p>
+                <p className="text-sm text-gray-500" suppressHydrationWarning>
+                  {formatDate(suite.createdAt)}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -48,4 +40,14 @@ export function SuiteList({ data }: { data: TPageData }) {
       ))}
     </div>
   )
+}
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
 }

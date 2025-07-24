@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgEnum, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { integer, pgEnum, pgTable, serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
 
 export const suite = pgTable('suite', {
   id: serial('id').primaryKey(),
@@ -34,7 +34,7 @@ export const test = pgTable('test', {
    * The ID of the suite this test belongs to.
    */
   suiteId: integer('suite_id')
-    .references(() => suite.id)
+    .references(() => suite.id, { onDelete: 'cascade' })
     .notNull(),
 })
 
@@ -51,7 +51,9 @@ export const testStep = pgTable('test_step', {
   id: serial('id').primaryKey(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 
-  testId: integer('test_id').references(() => test.id),
+  testId: integer('test_id')
+    .references(() => test.id, { onDelete: 'cascade' })
+    .notNull(),
 
   /**
    * The order of the step in the test.
@@ -86,7 +88,7 @@ export const suiteRun = pgTable('suite_run', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 
   suiteId: integer('suite_id')
-    .references(() => suite.id)
+    .references(() => suite.id, { onDelete: 'cascade' })
     .notNull(),
 
   status: runStatus('status').notNull(),
@@ -109,14 +111,14 @@ export const testRun = pgTable('test_run', {
    * The ID of the test this run belongs to.
    */
   testId: integer('test_id')
-    .references(() => test.id)
+    .references(() => test.id, { onDelete: 'cascade' })
     .notNull(),
 
   /**
    * The ID of the suite run this test run belongs to.
    */
   suiteRunId: integer('suite_run_id')
-    .references(() => suiteRun.id)
+    .references(() => suiteRun.id, { onDelete: 'cascade' })
     .notNull(),
 
   status: runStatus('status').notNull(),
@@ -132,41 +134,53 @@ export const testRun = pgTable('test_run', {
    * The URL of the live recording.
    */
   liveUrl: text('live_url'),
+
+  /**
+   * The URL of the public share.
+   */
+  publicShareUrl: text('public_share_url'),
 })
 
-export const testRunRelations = relations(testRun, ({ one }) => ({
+export const testRunRelations = relations(testRun, ({ one, many }) => ({
   test: one(test, {
     fields: [testRun.testId],
     references: [test.id],
   }),
+
   suiteRun: one(suiteRun, {
     fields: [testRun.suiteRunId],
     references: [suiteRun.id],
   }),
+
+  testRunSteps: many(testRunStep),
 }))
 
-export const testRunStepStatus = pgEnum('test_run_step_status', ['passed', 'failed', 'skipped'])
+export const testRunStep = pgTable(
+  'test_run_step',
+  {
+    id: serial('id').primaryKey(),
 
-export const testRunStep = pgTable('test_run_step', {
-  id: serial('id').primaryKey(),
+    testRunId: integer('test_run_id')
+      .references(() => testRun.id, { onDelete: 'cascade' })
+      .notNull(),
 
-  testRunId: integer('test_run_id')
-    .references(() => testRun.id)
-    .notNull(),
+    stepId: integer('step_id')
+      .references(() => testStep.id, { onDelete: 'cascade' })
+      .notNull(),
 
-  stepId: integer('step_id')
-    .references(() => testStep.id)
-    .notNull(),
-
-  status: testRunStepStatus('status'),
-})
+    status: runStatus('status').notNull(),
+  },
+  (table) => {
+    return [unique('test_run_step_unique').on(table.testRunId, table.stepId)]
+  },
+)
 
 export const testRunStepRelations = relations(testRunStep, ({ one }) => ({
   testRun: one(testRun, {
     fields: [testRunStep.testRunId],
     references: [testRun.id],
   }),
-  step: one(testStep, {
+  testStep: one(testStep, {
     fields: [testRunStep.stepId],
     references: [testStep.id],
   }),

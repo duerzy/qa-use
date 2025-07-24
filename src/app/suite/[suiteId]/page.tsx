@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { HistoryTab } from '../../../components/suite/HistoryTab'
 import { TestsTab } from '../../../components/suite/TestsTab'
-import { createTestAction, runSuiteAction } from './actions'
+import { createTestAction, deleteSuiteAction, runSuiteAction } from './actions'
 import { loader } from './loader'
 
 export default async function SuitePage({ params }: { params: Promise<{ suiteId: string }> }) {
@@ -33,6 +33,7 @@ export default async function SuitePage({ params }: { params: Promise<{ suiteId:
   }
 
   const runSuite = runSuiteAction.bind(null, suiteIdNum)
+  const deleteSuite = deleteSuiteAction.bind(null, suiteIdNum)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,14 +48,19 @@ export default async function SuitePage({ params }: { params: Promise<{ suiteId:
             Back to Suites
           </Link>
 
-          <div className="flex items-start justify-between">
-            <div>
+          <div className="flex items-start gap-4">
+            <div className="mr-auto">
               <h1 className="text-4xl font-bold text-gray-900 mb-2">{suite.name}</h1>
               <p className="text-md text-gray-500">{suite.domain}</p>
             </div>
+
             <form action={runSuite}>
-              <Button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700">
-                Run Suite
+              <Button type="submit">Run Suite</Button>
+            </form>
+
+            <form action={deleteSuite}>
+              <Button type="submit" variant="destructive">
+                Delete
               </Button>
             </form>
           </div>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useMemo } from 'react'
 
 import type { TSuiteRun } from '@/app/suite/[suiteId]/run/[suiteRunId]/loader'
 
@@ -14,29 +15,45 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
     }).format(d)
   }
 
+  const { nOfPassingTests, nOfFailedTests } = useMemo(() => {
+    return run.testRuns.reduce(
+      (acc, testRun) => {
+        if (testRun.status === 'passed') acc.nOfPassingTests++
+        else if (testRun.status === 'failed') acc.nOfFailedTests++
+        return acc
+      },
+      { nOfPassingTests: 0, nOfFailedTests: 0 },
+    )
+  }, [run.testRuns])
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-0">
-      {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">{run.suite.name}</h2>
-          <div className="text-sm text-gray-500 mt-1">Created: {formatDate(run.suite.createdAt)}</div>
-        </div>
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex gap-4 items-baseline">
+          <div className="mr-auto">
+            <Link href={`/suite/${run.suite.id}`} className="text-sm text-gray-500">
+              Back to suite
+            </Link>
+            <h2 className="text-4xl font-semibold text-gray-900 mt-2">Suite Run #{run.id}</h2>
+            <h3 className="text-2xl text-gray-500 mt-1">{run.suite.name}Suite</h3>
+          </div>
+
           <StatusBadge status={run.status} />
         </div>
 
-        <Link href={`/suite/${run.suite.id}`} className="text-sm text-gray-500">
-          Back to suite
-        </Link>
-      </div>
+        {/* Test Runs List */}
+        <div className="py-8">
+          <div className="flex items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mr-auto">Test Runs</h3>
 
-      {/* Test Runs List */}
-      <div className="px-6 py-8">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Test Runs</h3>
-        <div className="flex flex-col gap-4">
-          {run.testRuns && run.testRuns.length > 0 ? (
-            run.testRuns.map((testRun) => (
+            <p>
+              {nOfPassingTests} passed, {nOfFailedTests} failed
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {run.testRuns.map((testRun) => (
               <Link
                 key={testRun.id}
                 href={`/suite/${run.suite.id}/test/${testRun.testId}/run/${testRun.id}`}
@@ -45,15 +62,15 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium text-gray-900">{testRun.test.label}</div>
-                    <div className="text-sm text-gray-500">Created: {formatDate(testRun.createdAt)}</div>
+                    <div className="text-sm text-gray-500" suppressHydrationWarning>
+                      Created: {formatDate(testRun.createdAt)}
+                    </div>
                   </div>
                   <StatusBadge status={testRun.status} />
                 </div>
               </Link>
-            ))
-          ) : (
-            <div className="text-gray-400 italic">No test runs found.</div>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -66,6 +83,7 @@ function StatusBadge({ status }: { status: string }) {
   else if (status === 'failed') color = 'bg-red-100 text-red-800'
   else if (status === 'running') color = 'bg-blue-100 text-blue-800'
   else if (status === 'pending') color = 'bg-gray-100 text-gray-800'
+
   return (
     <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${color}`}>
       {status.charAt(0).toUpperCase() + status.slice(1)}

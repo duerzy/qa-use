@@ -1,67 +1,93 @@
 'use client'
 
+import { ArrowLeft, Monitor } from 'lucide-react'
 import Link from 'next/link'
 
 import type { TTestRun } from '@/app/suite/[suiteId]/test/[testId]/run/[testRunId]/loader'
-
-import { LivePreview } from './LivePreview'
+import { Button } from '@/components/ui/button'
 
 export function TestRunDetails({ run }: { run: TTestRun }) {
-  const { test, status, liveUrl } = run
+  const { test, error, status, publicShareUrl, liveUrl, testRunSteps } = run
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-0">
-      {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">{test.label}</h2>
-        </div>
-        <div className="flex items-center gap-4">
-          <StatusBadge status={status} />
-          <span className="text-sm text-gray-500">{formatDate(test.createdAt)}</span>
-        </div>
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex gap-4 items-baseline">
+          <div className="mr-auto">
+            <Link href={`/suite/${run.test.suiteId}/run/${run.suiteRunId}`} className="text-sm text-gray-500">
+              <Button size="sm">
+                <ArrowLeft className="w-4 h-4" />
+                Back to suite run
+              </Button>
+            </Link>
 
-        <Link href={`/suite/${run.test.suiteId}/run/${run.suiteRunId}`} className="text-sm text-gray-500">
-          Back to suite run
-        </Link>
-      </div>
+            <h2 className="text-4xl font-semibold text-gray-900 mt-5">{test.label}</h2>
+            <h3 className="text-2xl text-gray-500 mt-1" suppressHydrationWarning>
+              {formatDate(test.createdAt)}
+            </h3>
 
-      {/* Two Column Layout */}
-      <div className="flex flex-col md:flex-row gap-8 px-6 py-8">
-        {/* Left Column: Test Specification */}
-        <div className="md:w-1/2 w-full flex flex-col gap-8">
-          {/* Test Description */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
-            <p className="text-gray-700">{test.task}</p>
+            <div className="flex items-center gap-2">
+              <Link href={`/suite/${run.test.suiteId}/test/${run.test.id}`} className="text-base text-gray-500 mt-2">
+                View test
+              </Link>
+              {publicShareUrl && (
+                <Link href={publicShareUrl} className="text-base text-gray-500 mt-2">
+                  View Agent
+                </Link>
+              )}
+            </div>
           </div>
-
-          {/* Steps */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Steps</h3>
-            {test.steps && test.steps.length > 0 ? (
-              <ol className="list-decimal list-inside space-y-2">
-                {test.steps.map((step) => (
-                  <li key={step.id} className="text-gray-700">
-                    {step.description}
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="italic text-gray-400">No steps provided.</p>
-            )}
-          </div>
-
-          {/* Evaluation Criteria */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Evaluation Criteria</h3>
-            <p className="text-gray-700">{test.evaluation}</p>
+          <div className="flex items-center gap-4">
+            <StatusBadge status={status} />
           </div>
         </div>
 
-        {/* Right Column: Live Preview */}
-        <div className="md:w-1/2 w-full">
-          <LivePreview liveUrl={liveUrl} testStatus={status} />
+        {/* Two Column Layout */}
+        <div className="flex flex-col md:flex-row gap-8 py-8">
+          {/* Left Column: Test Specification */}
+          <div className="md:w-1/2 w-full flex flex-col gap-8">
+            {/* Test Description */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
+              <p className="text-gray-700">{test.task}</p>
+            </div>
+
+            {/* Steps */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Steps</h3>
+              {testRunSteps && testRunSteps.length > 0 ? (
+                <ol className="list-decimal list-inside space-y-2">
+                  {testRunSteps.map((step) => (
+                    <li key={step.id} className="text-gray-700">
+                      {step.testStep.description} <StatusBadge status={step.status} />
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="italic text-gray-400">No steps provided.</p>
+              )}
+            </div>
+            {/* Evaluation Criteria */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Evaluation Criteria</h3>
+              <p className="text-gray-700">{test.evaluation}</p>
+            </div>
+            {/* Result */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 mr-auto">Result</h3>
+
+                <StatusBadge status={status} />
+              </div>
+              <p className="text-gray-700">{error ? error : 'No error'}</p>
+            </div>
+          </div>
+
+          {/* Right Column: Live Preview */}
+          <div className="md:w-1/2 w-full">
+            <LivePreview liveUrl={liveUrl} testStatus={status} />
+          </div>
         </div>
       </div>
     </div>
@@ -101,6 +127,56 @@ function StatusBadge({ status }: { status: TTestRun['status'] }) {
         </span>
       )
   }
+}
+
+export function LivePreview({
+  liveUrl,
+  testStatus,
+}: {
+  liveUrl: string | null | undefined
+  testStatus: 'pending' | 'running' | 'passed' | 'failed'
+}) {
+  const showPlaceholder = !liveUrl
+
+  if (showPlaceholder) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="p-6">
+          <div
+            className="w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center text-gray-500"
+            style={{ aspectRatio: '16/10', minHeight: '400px' }}
+          >
+            <Monitor className="w-12 h-12 mb-4 text-gray-300" />
+            <div className="text-center">
+              <p className="font-medium mb-2">
+                {testStatus === 'passed' || testStatus === 'failed' ? 'Test completed' : 'Live preview not available'}
+              </p>
+              <p className="text-sm">
+                {testStatus === 'pending'
+                  ? 'Waiting for test to start...'
+                  : testStatus === 'passed' || testStatus === 'failed'
+                    ? 'Test execution has finished'
+                    : 'Preview will appear when test is running'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="p-6">
+        <div
+          className="w-full relative rounded-lg overflow-hidden border border-gray-200"
+          style={{ aspectRatio: '16/10', minHeight: '400px' }}
+        >
+          <iframe src={liveUrl} className="w-full h-full border-0" title="Live test preview" allow="fullscreen" />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function formatDate(date: Date | string) {

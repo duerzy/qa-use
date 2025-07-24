@@ -17,7 +17,9 @@ export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number })
             <div className="flex items-center gap-4">
               <div className="text-left">
                 <h3 className="font-semibold text-gray-900">{test.label}</h3>
-                <p className="text-sm text-gray-500">{formatDate(test.createdAt)}</p>
+                <p className="text-sm text-gray-500" suppressHydrationWarning>
+                  {formatDate(test.createdAt)}
+                </p>
                 <p className="text-xs text-gray-400">{test.steps.length} steps</p>
               </div>
             </div>

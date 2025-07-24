@@ -5,7 +5,7 @@ export const zResponse = z.object({
   steps: z
     .array(
       z.object({
-        id: z.string(),
+        id: z.number(),
         description: z.string(),
       }),
     )
@@ -20,9 +20,13 @@ export const RESPONSE_JSON_SCHEMA = z.toJSONSchema(zResponse)
 /**
  * Get the task response from the output.
  */
-export function getTaskResponse(output: string | null): TaskResponse | null {
+export function getTaskResponse(output: string | null): TaskResponse {
   if (!output) {
-    return null
+    return {
+      status: 'failing',
+      steps: [],
+      error: 'No output was provided!',
+    }
   }
 
   try {

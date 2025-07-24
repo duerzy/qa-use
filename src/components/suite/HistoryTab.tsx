@@ -33,7 +33,6 @@ export function HistoryTab({ suite }: { suite: TSuite }) {
   return (
     <div className="space-y-4">
       {suite.runs.map((run) => {
-        const status = getSuiteRunStatus(run)
         const isExpanded = expandedRuns.has(run.id)
 
         return (
@@ -45,8 +44,10 @@ export function HistoryTab({ suite }: { suite: TSuite }) {
               <div className="flex items-center gap-4">
                 <div className="text-left">
                   <h3 className="font-semibold text-gray-900">Suite Run #{run.id}</h3>
-                  <p className="text-sm text-gray-500">{formatDate(run.createdAt)}</p>
-                  <StatusBadge status={status} />
+                  <p className="text-sm text-gray-500" suppressHydrationWarning>
+                    {formatDate(run.createdAt)}
+                  </p>
+                  <StatusBadge status={run.status} />
                 </div>
               </div>
 
@@ -85,19 +86,6 @@ export function HistoryTab({ suite }: { suite: TSuite }) {
   )
 }
 
-function getSuiteRunStatus(suiteRun: TSuite['runs'][number]) {
-  if (!suiteRun.testRuns || suiteRun.testRuns.length === 0) {
-    return 'passing'
-  }
-
-  const hasRunning = suiteRun.testRuns.some((tr) => tr.status === 'pending' || tr.status === 'running')
-  const hasFailed = suiteRun.testRuns.some((tr) => tr.status === 'failed')
-
-  if (hasRunning) return 'running'
-  if (hasFailed) return 'failing'
-  return 'passing'
-}
-
 function StatusIcon({ status }: { status: string }) {
   switch (status) {
     case 'passed':
@@ -114,10 +102,11 @@ function StatusIcon({ status }: { status: string }) {
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
-    case 'passing':
-      return <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800`}>Passing</span>
-    case 'failing':
-      return <span className={`px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800`}>Failing</span>
+    case 'passed':
+      return <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800`}>Passed</span>
+    case 'failed':
+      return <span className={`px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800`}>Failed</span>
+    case 'pending':
     case 'running':
       return <span className={`px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>Running</span>
     default:
