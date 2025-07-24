@@ -1,31 +1,30 @@
 import { desc } from 'drizzle-orm'
+import { Plus } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { z } from 'zod/v4'
 
 import { Polling } from '@/components/Polling'
-import { RunSuiteButton } from '@/components/RunSuiteButton'
 import { SuiteList } from '@/components/SuiteList'
-import { client } from '@/lib/api/client'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { db } from '@/lib/db/db'
 import * as schema from '@/lib/db/schema'
-import { getTaskPrompt, RESPONSE_JSON_SCHEMA, TestSuiteDefinition } from '@/lib/testing/engine'
-import { SKYSCANNER_TEST_SUITE } from '@/lib/testing/mock'
 
 async function loader() {
   'use server'
 
   const suites = await db.query.suite.findMany({
     orderBy: [desc(schema.suite.createdAt)],
-    with: {
-      tests: {
-        orderBy: [desc(schema.test.createdAt)],
-        with: {
-          steps: {
-            orderBy: [desc(schema.testStep.order)],
-          },
-        },
-      },
-    },
   })
 
   return suites
@@ -33,81 +32,30 @@ async function loader() {
 
 export type TPageData = Awaited<ReturnType<typeof loader>>
 
-async function action(): Promise<{ suiteId: number } | { error: string }> {
+const zCreateSuite = z.object({
+  name: z.string().min(1),
+  domain: z.string().min(1),
+})
+
+async function action(form: FormData): Promise<void> {
   'use server'
 
-  const suite: TestSuiteDefinition = SKYSCANNER_TEST_SUITE
+  const { name, domain } = zCreateSuite.parse({
+    name: form.get('name'),
+    domain: form.get('domain'),
+  })
 
-  try {
-    // Create the suite
-    const [newSuite] = await db
-      .insert(schema.suite)
-      .values({
-        name: suite.label,
-      })
-      .returning()
+  // Create the suite
+  const [newSuite] = await db
+    .insert(schema.suite)
+    .values({
+      name,
+      domain,
+    })
+    .returning()
 
-    if (!newSuite) {
-      return { error: 'Failed to create suite' }
-    }
-
-    // Create tests and start browser tasks
-    for (const testDef of suite.tests) {
-      // Start browser task
-      const taskResponse = await client.POST('/api/v1/run-task', {
-        body: {
-          highlight_elements: false,
-          enable_public_share: false,
-          save_browser_data: false,
-          task: getTaskPrompt(testDef),
-          llm_model: 'gpt-4o-mini',
-          use_adblock: true,
-          use_proxy: true,
-          max_agent_steps: 10,
-          structured_output_json: JSON.stringify(RESPONSE_JSON_SCHEMA),
-        },
-      })
-
-      if (taskResponse.error) {
-        throw new Error(`Failed to start browser task: ${taskResponse.error}`)
-      }
-
-      const browserUseId = taskResponse.data.id
-
-      // Create test in database
-      const [newTest] = await db
-        .insert(schema.test)
-        .values({
-          label: testDef.label,
-          task: testDef.task,
-          evaluation: testDef.evaluation,
-          status: 'pending',
-          suiteId: newSuite.id,
-          browserUseId,
-        })
-        .returning()
-
-      if (!newTest) {
-        throw new Error('Failed to create test')
-      }
-
-      // Create test steps
-      for (const step of testDef.steps) {
-        await db.insert(schema.testStep).values({
-          testId: newTest.id,
-          order: step.id,
-          description: step.description,
-        })
-      }
-    }
-
-    revalidatePath('/')
-
-    return { suiteId: newSuite.id }
-  } catch (error) {
-    console.error('Error creating suite with tests:', error)
-    return { error: error instanceof Error ? error.message : 'Unknown error occurred' }
-  }
+  revalidatePath('/')
+  redirect(`/suite/${newSuite.id}`)
 }
 
 export default async function Page() {
@@ -119,7 +67,41 @@ export default async function Page() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">QA-Use</h1>
-          <RunSuiteButton onRunSuite={action} />
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                <Plus className="w-4 h-4" />
+                Create Suite
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create a new test suite</DialogTitle>
+                <DialogDescription>A test suite is a collection of tests that you can run together.</DialogDescription>
+
+                <form action={action} className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Suite Name
+                    </label>
+                    <Input id="name" name="name" type="text" placeholder="e.g., Login functionality test" required />
+                  </div>
+
+                  <div>
+                    <label htmlFor="domain" className="block text-sm font-medium text-gray-700 mb-1">
+                      Domain
+                    </label>
+                    <Input id="domain" name="domain" type="text" placeholder="e.g., example.com" required />
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button type="submit">Create</Button>
+                  </div>
+                </form>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Suites List */}

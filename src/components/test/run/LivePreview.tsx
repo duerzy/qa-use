@@ -8,7 +8,7 @@ export function LivePreview({
   testStatus,
 }: {
   liveUrl: string | null | undefined
-  testStatus: 'pending' | 'running' | 'completed' | 'failed'
+  testStatus: 'pending' | 'running' | 'passed' | 'failed'
 }) {
   const handleOpenExternal = useCallback(() => {
     if (liveUrl) {
@@ -16,7 +16,7 @@ export function LivePreview({
     }
   }, [liveUrl])
 
-  const showPlaceholder = !liveUrl || testStatus === 'completed' || testStatus === 'failed'
+  const showPlaceholder = !liveUrl
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
@@ -45,14 +45,12 @@ export function LivePreview({
             <Monitor className="w-12 h-12 mb-4 text-gray-300" />
             <div className="text-center">
               <p className="font-medium mb-2">
-                {testStatus === 'completed' || testStatus === 'failed'
-                  ? 'Test completed'
-                  : 'Live preview not available'}
+                {testStatus === 'passed' || testStatus === 'failed' ? 'Test completed' : 'Live preview not available'}
               </p>
               <p className="text-sm">
                 {testStatus === 'pending'
                   ? 'Waiting for test to start...'
-                  : testStatus === 'completed' || testStatus === 'failed'
+                  : testStatus === 'passed' || testStatus === 'failed'
                     ? 'Test execution has finished'
                     : 'Preview will appear when test is running'}
               </p>

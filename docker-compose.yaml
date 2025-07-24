@@ -10,7 +10,7 @@ services:
           action: sync+restart
         - path: ./package.json
           target: /app/package.json
-          action: sync+restart
+          action: rebuild
         - path: ./next.config.ts
           target: /app/next.config.ts
           action: sync+restart
@@ -26,8 +26,12 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/qa-use
+      #
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+      #
+      - INNGEST_DEV=1
+      - INNGEST_BASE_URL=http://inngest:8288
     ports:
       - '3000:3000'
     depends_on:
@@ -35,6 +39,16 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+    networks:
+      - qause-network
+
+  inngest:
+    image: inngest/inngest
+    command: 'inngest dev -u http://app:3000/api/inngest'
+    ports:
+      - '8288:8288'
+    depends_on:
+      - app
     networks:
       - qause-network
 

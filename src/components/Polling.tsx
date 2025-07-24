@@ -2,19 +2,9 @@
 
 import { useCallback, useEffect } from 'react'
 
-import { getRunningTests, updateTestStatus } from '@/lib/actions'
-
 function useTaskPolling() {
   const pollRunningTests = useCallback(async () => {
     try {
-      const runningTests = await getRunningTests()
-
-      if (runningTests.length === 0) {
-        return
-      }
-
-      // Update status for all running tests
-      await Promise.allSettled(runningTests.map(({ id, browserUseId }) => updateTestStatus(id, browserUseId)))
     } catch (error) {
       console.error('Error polling running tests:', error)
     }

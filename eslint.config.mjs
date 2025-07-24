@@ -51,6 +51,26 @@ const eslintConfig = [
       'simple-import-sort/exports': 'error',
     },
   },
+  {
+    rules: {
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          disallowTypeAnnotations: false,
+        },
+      ],
+
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_$',
+          varsIgnorePattern: '^_$',
+          caughtErrorsIgnorePattern: '^_$',
+        },
+      ],
+    },
+  },
 ]
 
 export default eslintConfig

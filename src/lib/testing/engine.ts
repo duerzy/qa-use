@@ -69,6 +69,8 @@ export type TestDefinition = {
 export type TestSuiteDefinition = {
   label: string
 
+  domain: string
+
   /**
    * The tests to run.
    */
@@ -85,6 +87,11 @@ You'll be given a task description, steps, and success criteria. You need to
 3. Evaluate whether you can perform all steps in the exact order they are given.
 4. Evaluate the end state of the application against the success criteria.
 5. Only evaluate the end state once all previous steps have successfully been performed.
+
+# Running the Test
+
+- Perform the steps in the exact order they are given.
+- Do not search for potential fixes or workarounds.
 
 
 # Success and Failure Criteria for Steps
