@@ -37,6 +37,11 @@ export async function runSuiteAction(suiteId: number, _: FormData) {
       .returning()
 
     for (const test of suite.tests) {
+      // NOTE: We skip test runs with no steps because they won't do anything.
+      if (test.steps.length === 0) {
+        continue
+      }
+
       const [newTestRun] = await tx
         .insert(schema.testRun)
         .values({
@@ -76,7 +81,6 @@ export async function runSuiteAction(suiteId: number, _: FormData) {
 
 const zCreateTest = z.object({
   label: z.string().min(1),
-  task: z.string().min(1),
   suiteId: z.number(),
 })
 
@@ -91,7 +95,6 @@ export async function createTestAction(suiteId: number, formData: FormData) {
     .insert(schema.test)
     .values({
       label: data.label,
-      task: data.task,
       evaluation: '',
       suiteId: data.suiteId,
     })

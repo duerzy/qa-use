@@ -14,7 +14,7 @@ export async function loader({ suiteRunId }: { suiteRunId: number }) {
         with: {
           test: true,
         },
-        orderBy: [asc(schema.testRun.createdAt)],
+        orderBy: [asc(schema.testRun.id)],
       },
     },
   })

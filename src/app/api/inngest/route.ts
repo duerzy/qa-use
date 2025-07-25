@@ -1,7 +1,7 @@
 import { serve } from 'inngest/next'
 
 import { inngest } from '@/lib/inngest/client'
-import { helloWorld, runTestSuite } from '@/lib/inngest/functions'
+import { helloWorld, runTest, runTestSuite } from '@/lib/inngest/functions'
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -10,5 +10,6 @@ export const { GET, POST, PUT } = serve({
     //
     helloWorld,
     runTestSuite,
+    runTest,
   ],
 })

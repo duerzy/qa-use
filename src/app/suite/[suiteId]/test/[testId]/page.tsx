@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { TestDetails } from '@/components/test/TestDetails'
 
+import { runTestAction } from './actions'
 import { loader } from './loader'
 
 export default async function TestPage({ params }: { params: Promise<{ suiteId: string; testId: string }> }) {
@@ -19,5 +20,7 @@ export default async function TestPage({ params }: { params: Promise<{ suiteId: 
     notFound()
   }
 
-  return <TestDetails test={test} />
+  const runTest = runTestAction.bind(null, testIdNum)
+
+  return <TestDetails test={test} runTest={runTest} />
 }

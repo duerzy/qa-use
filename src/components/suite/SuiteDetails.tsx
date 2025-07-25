@@ -12,9 +12,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { PageHeader } from '../shared/PageHeader'
+import { SectionHeader } from '../shared/SectionHeader'
 import { HistoryTab } from './HistoryTab'
 import { TestsTab } from './TestsTab'
 
@@ -37,48 +37,49 @@ export function SuiteDetails({
       <PageHeader title={suite.name} subtitle={suite.domain} back={{ href: '/', label: 'All Suites' }} />
 
       {/* Body with Tabs */}
-      <Tabs defaultValue="history" className="space-y-6">
-        <div className="flex items-center justify-between gap-3">
-          <TabsList>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="tests">Tests</TabsTrigger>
-          </TabsList>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
+        <div className="col-span-1">
+          <SectionHeader
+            title="Tests"
+            actions={[<CreateTestDialog key="create-test-dialog" suiteId={suite.id} createTest={createTest} />]}
+          />
 
-          <CreateTestDialog suiteId={suite.id} createTest={createTest} />
-
-          <form action={runSuite}>
-            <Button type="submit">
-              <Play className="w-4 h-4" />
-              Run Suite
-            </Button>
-          </form>
-
-          <form action={deleteSuite}>
-            <Button type="submit" variant="destructive">
-              <Trash />
-            </Button>
-          </form>
+          <TestsTab suite={suite} suiteId={suite.id} />
         </div>
 
-        <TabsContent value="history">
+        <div className="col-span-1">
+          <SectionHeader
+            title="History"
+            actions={[
+              <form key="run-suite-form" action={runSuite}>
+                <Button type="submit" variant="outline">
+                  <Play className="w-4 h-4" />
+                  Run Suite
+                </Button>
+              </form>,
+            ]}
+          />
           <HistoryTab suite={suite} />
-        </TabsContent>
+        </div>
+      </div>
 
-        <TabsContent value="tests">
-          <TestsTab suite={suite} suiteId={suite.id} />
-        </TabsContent>
-      </Tabs>
+      <div className="mt-9" />
+
+      <SectionHeader
+        title="Settings"
+        actions={[
+          <form key="delete-suite-form" action={deleteSuite}>
+            <Button type="submit" variant="destructive">
+              <Trash /> Delete Suite
+            </Button>
+          </form>,
+        ]}
+      />
     </Fragment>
   )
 }
 
-function CreateTestDialog({
-  suiteId,
-  createTest,
-}: {
-  suiteId: number
-  createTest: (formData: FormData) => Promise<void>
-}) {
+function CreateTestDialog({ createTest }: { suiteId: number; createTest: (formData: FormData) => Promise<void> }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -103,21 +104,6 @@ function CreateTestDialog({
             </label>
             <Input id="label" name="label" type="text" placeholder="e.g., Login functionality test" required />
           </div>
-
-          <div>
-            <label htmlFor="task" className="block text-sm font-medium text-gray-700 mb-1">
-              Task Description
-            </label>
-            <Input
-              id="task"
-              name="task"
-              type="text"
-              placeholder="e.g., Verify user can log in with valid credentials"
-              required
-            />
-          </div>
-
-          <input type="hidden" name="suiteId" value={suiteId} />
 
           <div className="flex justify-end gap-2">
             <Button type="submit">Create Test</Button>

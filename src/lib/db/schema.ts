@@ -27,7 +27,6 @@ export const test = pgTable('test', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 
   label: text('label').notNull(),
-  task: text('task').notNull(),
   evaluation: text('evaluation').notNull(),
 
   /**
@@ -139,10 +138,7 @@ export const testRun = pgTable('test_run', {
   /**
    * The ID of the suite run this test run belongs to.
    */
-  suiteRunId: integer('suite_run_id')
-    .references(() => suiteRun.id, { onDelete: 'cascade' })
-    .notNull(),
-
+  suiteRunId: integer('suite_run_id').references(() => suiteRun.id, { onDelete: 'cascade' }),
   status: runStatus('status').notNull(),
 
   error: text('error'),

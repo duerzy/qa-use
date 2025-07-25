@@ -9,7 +9,7 @@ import * as schema from '@/lib/db/schema'
 import { ExhaustiveSwitchCheck } from '@/lib/types'
 
 export async function saveTest(id: number, test: State, _: FormData): Promise<void> {
-  const { label, task, evaluation, steps } = test
+  const { label, evaluation, steps } = test
 
   const dbTest = await db.query.test.findFirst({
     where: eq(schema.test.id, id),
@@ -23,7 +23,6 @@ export async function saveTest(id: number, test: State, _: FormData): Promise<vo
     .update(schema.test)
     .set({
       label,
-      task,
       evaluation,
     })
     .where(eq(schema.test.id, id))

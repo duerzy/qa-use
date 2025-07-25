@@ -49,7 +49,6 @@ export async function seedSuiteAction() {
       .insert(schema.test)
       .values({
         label: test.label,
-        task: test.task,
         evaluation: test.evaluation,
         suiteId: insertedSuite.id,
       })

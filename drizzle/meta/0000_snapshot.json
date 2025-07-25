@@ -1,5 +1,5 @@
 {
-  "id": "f958ebed-6ec4-405b-b868-19f8baec5c46",
+  "id": "6840acd0-cdec-46b7-b319-c5129d7ce4c9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -131,12 +131,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "task": {
-          "name": "task",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "evaluation": {
           "name": "evaluation",
           "type": "text",
@@ -212,7 +206,7 @@
           "name": "suite_run_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "status": {
           "name": "status",

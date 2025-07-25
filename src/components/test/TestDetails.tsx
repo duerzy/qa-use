@@ -1,3 +1,4 @@
+import { PencilIcon, Play } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo } from 'react'
 
@@ -11,7 +12,7 @@ import { SectionHeader } from '../shared/SectionHeader'
 import { formatDate } from '../shared/utils'
 import { Button } from '../ui/button'
 
-export function TestDetails({ test }: { test: TTest }) {
+export function TestDetails({ test, runTest }: { test: TTest; runTest: (formData: FormData) => Promise<void> }) {
   const poll = useMemo(() => test.runs.some((run) => run.status === 'pending'), [test.runs])
 
   return (
@@ -32,7 +33,9 @@ export function TestDetails({ test }: { test: TTest }) {
             title="Steps"
             actions={[
               <Link href={`/suite/${test.suiteId}/test/${test.id}/edit`} key="edit-steps-link">
-                <Button>Edit</Button>
+                <Button variant="outline" size="icon">
+                  <PencilIcon className="w-4 h-4" />
+                </Button>
               </Link>,
             ]}
           />
@@ -45,11 +48,6 @@ export function TestDetails({ test }: { test: TTest }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>{test.task}</TableCell>
-              </TableRow>
-
               {test.steps.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={2} className="">
@@ -69,7 +67,7 @@ export function TestDetails({ test }: { test: TTest }) {
             {test.evaluation && (
               <TableFooter>
                 <TableRow>
-                  <TableCell></TableCell>
+                  <TableCell>Eval</TableCell>
                   <TableCell>
                     <p className="break-words">{test.evaluation}</p>
                   </TableCell>
@@ -82,7 +80,17 @@ export function TestDetails({ test }: { test: TTest }) {
         {/* Runs */}
 
         <div>
-          <SectionHeader title="Runs" actions={[]} />
+          <SectionHeader
+            title="Runs"
+            actions={[
+              <form action={runTest} key="run-test-form">
+                <Button>
+                  <Play className="w-4 h-4" />
+                  Run Test
+                </Button>
+              </form>,
+            ]}
+          />
 
           <Table>
             <TableHeader>

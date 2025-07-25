@@ -55,11 +55,6 @@ export type TestDefinition = {
   label: string
 
   /**
-   * The high level description of the task you are validating.
-   */
-  task: string
-
-  /**
    * The steps you need to take to get there.
    */
   steps: { id: number; description: string }[]
@@ -150,7 +145,6 @@ The task will be given in the following format:
 
 \`\`\`
 <test>
-  <description>...</description>
   <steps>
     <step id="...">
       The step description..
@@ -168,9 +162,8 @@ The task will be given in the following format:
 
 \`\`\`
 <test>
-  <description>Validate that the user can create a new search</description>
   <steps>
-    <step id="1">Go to the search page</step>
+    <step id="1">Go to the example.com website</step>
     <step id="2">Type in "London" in the search input</step>
     <step id="3">Click the search button</step>
     <step id="4">The app should show a list of results</step>
@@ -197,7 +190,6 @@ The task will be given in the following format:
 function stringifyTest(test: TestDefinition) {
   return `
 <test>
-  <description>${test.task}</description>
   <steps>
     ${test.steps.map((step) => `<step id="${step.id}">${step.description}</step>`).join('\n')}
   </steps>
@@ -224,18 +216,15 @@ ${stringifyTest(test)}
  */
 export function createTest({
   label,
-  task,
   steps,
   evaluation,
 }: {
   label: string
-  task: string
   steps: string[]
   evaluation: string
 }): TestDefinition {
   return {
     label,
-    task,
     steps: steps.map((step, index) => ({ id: index + 1, description: step })),
     evaluation,
   }

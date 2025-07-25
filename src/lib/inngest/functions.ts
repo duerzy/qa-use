@@ -29,6 +29,32 @@ export const helloWorld = inngest.createFunction(
 )
 
 /**
+ * Performs a single test run.
+ */
+export const runTest = inngest.createFunction(
+  {
+    id: 'run-test',
+    onFailure: async ({ event, step }) => {
+      const testRunId = event.data.event.data.testRunId
+
+      await step.run('update-test-run-status', async () => {
+        await db.update(schema.testRun).set({ status: 'failed' }).where(eq(schema.testRun.id, testRunId))
+      })
+    },
+  },
+  { event: 'test/run' },
+  async ({ step, event }) => {
+    const testRunId = event.data.testRunId
+
+    await step.run(`start-test-run-${testRunId}`, _startTestRun, { testRunId })
+
+    await step.run(`complete-test-run-${testRunId}`, _pollTaskUntilFinished, { testRunId })
+
+    await step.run(`finalize-test-run`, _finalizeTestRun, { testRunId })
+  },
+)
+
+/**
  * Runs a test suite.
  */
 export const runTestSuite = inngest.createFunction(
@@ -56,15 +82,13 @@ export const runTestSuite = inngest.createFunction(
       return dbTestRuns.map((testRun) => testRun.id)
     })
 
-    const dbTestsRuns = await Promise.all(
+    await Promise.all(
       testRunIds.map((testRunId) => step.run(`start-test-run-${testRunId}`, _startTestRun, { testRunId })),
     )
 
-    const timeouts = dbTestsRuns.map((testRunId) =>
-      step.run(`complete-test-run-${testRunId}`, _pollTaskUntilFinished, { testRunId }),
+    await Promise.all(
+      testRunIds.map((testRunId) => step.run(`complete-test-run-${testRunId}`, _pollTaskUntilFinished, { testRunId })),
     )
-
-    await Promise.all(timeouts)
 
     await step.run(`finalize-suite-run`, _finalizeSuiteRun, { suiteId: event.data.suiteRunId, testRunIds })
   },
@@ -98,7 +122,6 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
     evaluation: dbTestRun.test.evaluation,
     label: dbTestRun.test.label,
     steps: dbTestRun.test.steps,
-    task: dbTestRun.test.task,
   }
 
   // Start browser task
@@ -108,7 +131,11 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
       enable_public_share: true,
       save_browser_data: false,
       task: getTaskPrompt(definition),
-      llm_model: 'o4-mini',
+      //
+      // NOTE: Choose between o4-mini and o3. o3 is more expensive but more accurate.
+      // llm_model: 'o4-mini',
+      llm_model: 'o3',
+      //
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
@@ -123,12 +150,14 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
     })
   }
 
-  await db
-    .update(schema.suiteRun)
-    .set({
-      status: 'running',
-    })
-    .where(eq(schema.suiteRun.id, dbTestRun.suiteRunId))
+  if (dbTestRun.suiteRunId) {
+    await db
+      .update(schema.suiteRun)
+      .set({
+        status: 'running',
+      })
+      .where(eq(schema.suiteRun.id, dbTestRun.suiteRunId))
+  }
 
   await db
     .update(schema.testRun)
@@ -263,6 +292,28 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
         throw new ExhaustiveSwitchCheck(buTaskResponse.data.status)
     }
   }
+}
+
+async function _finalizeTestRun({ testRunId }: { testRunId: number }) {
+  const dbTestRun = await db.query.testRun.findFirst({
+    where: eq(schema.testRun.id, testRunId),
+  })
+
+  if (!dbTestRun) {
+    throw new NonRetriableError(`Test run not found: ${testRunId}`)
+  }
+
+  const hasFailed = dbTestRun.status === 'failed'
+
+  await db
+    .update(schema.testRun)
+    .set({
+      finishedAt: new Date(),
+      status: hasFailed ? 'failed' : 'passed',
+    })
+    .where(eq(schema.testRun.id, testRunId))
+
+  return { hasFailed }
 }
 
 async function _finalizeSuiteRun({ suiteId, testRunIds }: { suiteId: number; testRunIds: number[] }) {

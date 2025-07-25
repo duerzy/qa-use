@@ -12,9 +12,16 @@ export type RunTestSuiteEvent = {
   }
 }
 
+export type RunTestEvent = {
+  data: {
+    testRunId: number
+  }
+}
+
 type Events = {
   hello: HelloEvent
   'test-suite/run': RunTestSuiteEvent
+  'test/run': RunTestEvent
 }
 
 export const inngest = new Inngest({

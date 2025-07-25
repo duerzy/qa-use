@@ -3,7 +3,6 @@ import { createTest } from '@/lib/testing/engine'
 
 export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
   label: 'Passing Skyscanner Search',
-  task: 'Validate that you can create a new flight search on skyscanner.com',
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',
@@ -19,7 +18,6 @@ export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
 
 export const SKYSCANNER_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
   label: 'Failing Evaluation Skyscanner Search',
-  task: 'Validate that you can create a new flight search on skyscanner.com',
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',
@@ -34,7 +32,6 @@ export const SKYSCANNER_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
 
 export const SKYSCANNER_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
   label: 'Failing Test Skyscanner Search',
-  task: 'Validate that you can create a new flight search on skyscanner.com',
   steps: [
     'Go to skyscanner.com',
     'Select One-Way Flights',

@@ -19,7 +19,6 @@ CREATE TABLE "test" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"label" text NOT NULL,
-	"task" text NOT NULL,
 	"evaluation" text NOT NULL,
 	"suite_id" integer NOT NULL
 );
@@ -30,7 +29,7 @@ CREATE TABLE "test_run" (
 	"started_at" timestamp DEFAULT now(),
 	"finished_at" timestamp,
 	"test_id" integer NOT NULL,
-	"suite_run_id" integer NOT NULL,
+	"suite_run_id" integer,
 	"status" "run_status" NOT NULL,
 	"error" text,
 	"browser_use_id" text,

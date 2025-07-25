@@ -1,12 +1,13 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useReducer } from 'react'
+import { Check, Trash2 } from 'lucide-react'
+import { Fragment, useMemo, useReducer } from 'react'
 
 import { saveTest } from '@/app/suite/[suiteId]/test/[testId]/edit/actions'
 import type { TTest } from '@/app/suite/[suiteId]/test/[testId]/edit/loader'
 
+import { PageHeader } from '../shared/PageHeader'
+import { SectionHeader } from '../shared/SectionHeader'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
@@ -33,7 +34,6 @@ type Step =
 
 export type State = {
   label: string
-  task: string
   evaluation: string
 
   nextStepId: number
@@ -57,7 +57,6 @@ function getInitialState(test: TTest): State {
 
   return {
     label: test.label,
-    task: test.task,
     evaluation: test.evaluation,
     nextStepId: steps.length,
 
@@ -67,7 +66,6 @@ function getInitialState(test: TTest): State {
 
 type Action =
   | { type: 'setLabel'; label: string }
-  | { type: 'setTask'; task: string }
   | { type: 'setEvaluation'; evaluation: string }
   | { type: 'createStep' }
   | { type: 'changeStepDescription'; stepId: string; description: string }
@@ -77,8 +75,6 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'setLabel':
       return { ...state, label: action.label }
-    case 'setTask':
-      return { ...state, task: action.task }
     case 'setEvaluation':
       return { ...state, evaluation: action.evaluation }
     case 'createStep':
@@ -136,81 +132,135 @@ export function TestEditor({ test }: { test: TTest }) {
   const action = useMemo(() => saveTest.bind(null, test.id, state), [test.id, state])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold mb-4">Edit Test</h2>
+    <Fragment>
+      <PageHeader
+        title={test.label}
+        subtitle={`Suite ID: ${test.suiteId} | Test ID: ${test.id}`}
+        back={{ href: `/suite/${test.suiteId}/test/${test.id}`, label: 'Back to Test' }}
+      />
 
-        <div className="flex items-center justify-between mb-8">
-          <Link href={`/suite/${test.suiteId}/test/${test.id}`} className="text-sm text-gray-500">
-            Back to Test
-          </Link>
-        </div>
-      </div>
+      {/* Test Meta */}
 
-      <div className="max-w-4xl mx-auto px-6 py-8 grid grid-cols-2 gap-4">
-        {/* Test Meta */}
-        <div className="col-span-1 flex flex-col gap-3">
-          <h2 className="text-lg font-medium">Test Details</h2>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-medium">Label</h3>
-            <Input value={state.label} onChange={(e) => dispatch({ type: 'setLabel', label: e.target.value })} />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-medium">Task</h3>
-            <Textarea
-              value={state.task}
-              onChange={(e) => dispatch({ type: 'setTask', task: e.target.value })}
-              rows={8}
-            />
-          </div>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-2">
+          <h3 className="text-lg font-medium">Label</h3>
+          <Input value={state.label} onChange={(e) => dispatch({ type: 'setLabel', label: e.target.value })} />
         </div>
 
         {/* Test Steps */}
 
-        <div className="col-span-1 flex flex-col gap-3">
-          <h2 className="text-lg font-medium">Steps</h2>
+        <SectionHeader title="Steps" actions={[]} />
 
-          {state.steps.map((step) => (
-            <div key={step.id} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-medium">Step {step.order + 1}</h3>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => dispatch({ type: 'deleteStep', stepId: step.id })}
-                  className="ml-auto"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-              <Input
-                value={step.description}
-                onChange={(e) =>
-                  dispatch({ type: 'changeStepDescription', stepId: step.id, description: e.target.value })
-                }
-              />
+        <TestWritingGuide />
+
+        {state.steps.map((step) => (
+          <div key={step.id} className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 py-3">
+              <h3 className="text-lg font-medium">Step {step.order + 1}</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => dispatch({ type: 'deleteStep', stepId: step.id })}
+                className="ml-auto"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
             </div>
-          ))}
-
-          <Button onClick={() => dispatch({ type: 'createStep' })}>Add Step</Button>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-medium">Evaluation</h3>
-            <Textarea
-              value={state.evaluation}
-              onChange={(e) => dispatch({ type: 'setEvaluation', evaluation: e.target.value })}
-              rows={4}
+            <Input
+              value={step.description}
+              onChange={(e) =>
+                dispatch({ type: 'changeStepDescription', stepId: step.id, description: e.target.value })
+              }
             />
           </div>
+        ))}
+
+        <Button onClick={() => dispatch({ type: 'createStep' })}>Add Step</Button>
+
+        <EvaluationWritingGuide />
+
+        <div className="flex flex-col gap-2">
+          <h3 className="text-lg font-medium">Evaluation</h3>
+          <Textarea
+            value={state.evaluation}
+            onChange={(e) => dispatch({ type: 'setEvaluation', evaluation: e.target.value })}
+            rows={4}
+          />
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <form action={action}>
-          <Button type="submit">Save</Button>
-        </form>
+      <form action={action} className="mt-5">
+        <Button className="w-full" type="submit" disabled={state.steps.length === 0}>
+          Save
+        </Button>
+      </form>
+    </Fragment>
+  )
+}
+
+function TestWritingGuide() {
+  return (
+    <div className="relative flex flex-col gap-4 p-8 rounded-2xl border border-gray-200 shadow-sm bg-white overflow-hidden">
+      {/* Gradient orb in top right corner */}
+      <div
+        className="absolute top-0 right-0 w-96 h-96 rounded-full bg-radial from-green-700 via-green-400 to-green-200 blur-3xl opacity-60 pointer-events-none z-0"
+        style={{ transform: 'translate(40%,-40%)' }}
+      />
+      <div className="relative z-10">
+        <h3 className="text-2xl font-bold text-gray-800 mb-1">Steps Writing Guide</h3>
+        <p className="text-gray-600 mb-5 text-base">Write test steps that are clear and easy to understand.</p>
+        <ul className="flex flex-col gap-3">
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-green-600" />
+            <span className="text-gray-800">Describe the action to be taken.</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-green-600" />
+            <span className="text-gray-800">Describe the expected result of each step.</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-green-600" />
+            <span className="text-gray-800">
+              Be precise and specific. <br />
+              <span className="text-gray-600 text-sm">
+                (e.g. &quot;Select Paris as departure location&quot;, &quot; Type London as destination and select
+                London as destination from the dropdown&quot;).
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+function EvaluationWritingGuide() {
+  return (
+    <div className="relative flex flex-col gap-4 p-8 rounded-2xl border border-gray-200 shadow-sm bg-white overflow-hidden">
+      {/* Gradient orb in top right corner */}
+      <div
+        className="absolute top-0 right-0 w-96 h-96 rounded-full bg-radial from-blue-700 via-blue-400 to-blue-200 blur-3xl opacity-60 pointer-events-none z-0"
+        style={{ transform: 'translate(40%,-40%)' }}
+      />
+      <div className="relative z-10">
+        <h3 className="text-2xl font-bold text-gray-800 mb-1">Evaluation Writing Guide</h3>
+        <p className="text-gray-600 mb-5 text-base">
+          Evaluation should clearly describe everything that is expected to be true. Follow examples below!
+        </p>
+        <ul className="flex flex-col gap-3">
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-blue-600" />
+            <span className="text-gray-800">&quot;There&apos;s at least one search result&quot;.</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-blue-600" />
+            <span className="text-gray-800">&quot;There are no search results&quot;.</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="flex-none w-3 h-3 text-blue-600" />
+            <span className="text-gray-800">&quot;All search results show flights from Paris to London&quot;.</span>
+          </li>
+        </ul>
       </div>
     </div>
   )
