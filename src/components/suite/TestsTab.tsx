@@ -20,8 +20,8 @@ export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number })
       <TableBody>
         {suite.tests.length === 0 && (
           <TableRow>
-            <TableCell colSpan={4} className="">
-              No tests found
+            <TableCell colSpan={3} className="">
+              No tests found...
             </TableCell>
           </TableRow>
         )}

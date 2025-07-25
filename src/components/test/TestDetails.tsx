@@ -1,4 +1,4 @@
-import { PencilIcon, Play } from 'lucide-react'
+import { PencilIcon, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo } from 'react'
 
@@ -12,7 +12,15 @@ import { SectionHeader } from '../shared/SectionHeader'
 import { formatDate } from '../shared/utils'
 import { Button } from '../ui/button'
 
-export function TestDetails({ test, runTest }: { test: TTest; runTest: (formData: FormData) => Promise<void> }) {
+export function TestDetails({
+  test,
+  runTest,
+  deleteTest,
+}: {
+  test: TTest
+  runTest: (formData: FormData) => Promise<void>
+  deleteTest: (formData: FormData) => Promise<void>
+}) {
   const poll = useMemo(() => test.runs.some((run) => run.status === 'pending'), [test.runs])
 
   return (
@@ -37,6 +45,12 @@ export function TestDetails({ test, runTest }: { test: TTest; runTest: (formData
                   <PencilIcon className="w-4 h-4" />
                 </Button>
               </Link>,
+
+              <form action={deleteTest} key="delete-test-form">
+                <Button variant="destructive" size="icon">
+                  <Trash className="w-4 h-4" />
+                </Button>
+              </form>,
             ]}
           />
 

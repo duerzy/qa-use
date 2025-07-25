@@ -23,7 +23,7 @@ export function HistoryTab({ suite }: { suite: TSuite }) {
         {suite.runs.length === 0 && (
           <TableRow>
             <TableCell colSpan={4} className="">
-              No runs found
+              No runs found...
             </TableCell>
           </TableRow>
         )}

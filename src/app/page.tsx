@@ -59,7 +59,7 @@ export default async function Page() {
           {suites.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="">
-                No suites found
+                No suites found...
               </TableCell>
             </TableRow>
           )}

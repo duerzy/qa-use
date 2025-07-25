@@ -1,6 +1,8 @@
 import { relations } from 'drizzle-orm'
 import { integer, pgEnum, pgTable, serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
 
+export const cronCadence = pgEnum('cron_cadence', ['hourly', 'daily'])
+
 export const suite = pgTable('suite', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
@@ -11,6 +13,21 @@ export const suite = pgTable('suite', {
    * The domain of the application under test.
    */
   domain: text('domain').notNull(),
+
+  /**
+   * The cadence of the cron job. If not set, the suite will not be run by cron.
+   */
+  cronCadence: cronCadence('cron_cadence'),
+
+  /**
+   * The last time the cron job was run.
+   */
+  lastCronRunAt: timestamp('last_cron_run_at'),
+
+  /**
+   * The email address to send notifications to. If not set, no notifications will be sent.
+   */
+  notificationsEmailAddress: text('notifications_email_address'),
 })
 
 export const suiteRelations = relations(suite, ({ many }) => ({

@@ -58,3 +58,20 @@ export async function runTestAction(testId: number, _: FormData) {
 
   redirect(`/suite/${test.suiteId}/test/${testId}/run/${testRunId}`, RedirectType.push)
 }
+
+export async function deleteTestAction(testId: number, _: FormData) {
+  const test = await db.query.test.findFirst({
+    where: eq(schema.test.id, testId),
+    with: {
+      suite: true,
+    },
+  })
+
+  if (!test) {
+    throw new Error(`Test not found: ${testId}`)
+  }
+
+  await db.delete(schema.test).where(eq(schema.test.id, testId))
+  revalidatePath(`/suite/${test.suiteId}`)
+  redirect(`/suite/${test.suiteId}`, RedirectType.push)
+}

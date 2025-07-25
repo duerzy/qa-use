@@ -1,5 +1,7 @@
+'use client'
+
 import { Play, Plus, Trash } from 'lucide-react'
-import { Fragment } from 'react'
+import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import type { TSuite } from '@/app/suite/[suiteId]/loader'
 import { Button } from '@/components/ui/button'
@@ -15,8 +17,11 @@ import { Input } from '@/components/ui/input'
 
 import { PageHeader } from '../shared/PageHeader'
 import { SectionHeader } from '../shared/SectionHeader'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
 import { HistoryTab } from './HistoryTab'
 import { TestsTab } from './TestsTab'
+
+const NULL_CADENCE = '__null__'
 
 /**
  * Renders the details of a given suite.
@@ -26,12 +31,44 @@ export function SuiteDetails({
   runSuite,
   deleteSuite,
   createTest,
+  setCronCadence,
+  setNotificationsEmailAddress,
 }: {
   suite: TSuite
   runSuite: (formData: FormData) => Promise<void>
   deleteSuite: (formData: FormData) => Promise<void>
   createTest: (formData: FormData) => Promise<void>
+  setCronCadence: (cadence: 'hourly' | 'daily' | null, formData: FormData) => Promise<void>
+  setNotificationsEmailAddress: (formData: FormData) => Promise<void>
 }) {
+  const [_cadence, _setCadence] = useState<'hourly' | 'daily' | null>(suite.cronCadence)
+
+  const cadence = useMemo(() => {
+    if (_cadence == null) {
+      return NULL_CADENCE
+    }
+
+    return _cadence
+  }, [_cadence])
+
+  const setCadence = useCallback((value: string) => {
+    switch (value) {
+      case NULL_CADENCE:
+        _setCadence(null)
+        break
+      case 'hourly':
+        _setCadence('hourly')
+        break
+      case 'daily':
+        _setCadence('daily')
+        break
+      default:
+        throw new Error(`Invalid cadence: ${value}`)
+    }
+  }, [])
+
+  const handleChangeCadence = useMemo(() => setCronCadence.bind(null, _cadence), [_cadence, setCronCadence])
+
   return (
     <Fragment>
       <PageHeader title={suite.name} subtitle={suite.domain} back={{ href: '/', label: 'All Suites' }} />
@@ -75,6 +112,56 @@ export function SuiteDetails({
           </form>,
         ]}
       />
+
+      <div className="mt-3">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Cron</h3>
+
+        <div className="flex flex-col  gap-2">
+          <p className="text-sm text-gray-500">Run this suite on a cron schedule.</p>
+
+          <div className="flex items-center gap-2">
+            <Select value={cadence} onValueChange={setCadence}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Cadence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Disabled</SelectLabel>
+                  <SelectItem value={NULL_CADENCE}>Disabled</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Enabled</SelectLabel>
+                  <SelectItem value="hourly">Hourly</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            <form action={handleChangeCadence}>
+              <Button type="submit">Save</Button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Notifications</h3>
+
+        <div className="flex flex-col  gap-2">
+          <p className="text-sm text-gray-500">Send notifications to this email address.</p>
+
+          <form action={setNotificationsEmailAddress} className="flex items-center gap-2">
+            <Input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              defaultValue={suite.notificationsEmailAddress ?? ''}
+            />
+
+            <Button type="submit">Save</Button>
+          </form>
+        </div>
+      </div>
     </Fragment>
   )
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "suite" ADD COLUMN "notifications_email_address" text;

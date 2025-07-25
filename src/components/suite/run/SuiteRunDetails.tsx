@@ -52,7 +52,7 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
           {run.testRuns.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="">
-                No suites found
+                No test runs found...
               </TableCell>
             </TableRow>
           )}

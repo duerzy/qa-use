@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export function PageHeader({
@@ -18,6 +19,7 @@ export function PageHeader({
           href={back.href}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
         >
+          <ChevronLeft className="w-4 h-4" />
           {back.label}
         </Link>
       )}

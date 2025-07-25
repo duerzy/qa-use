@@ -4,10 +4,14 @@ import { NonRetriableError, RetryAfterError } from 'inngest'
 import { client } from '../api/client'
 import { db } from '../db/db'
 import * as schema from '../db/schema'
+import { resend } from '../resend/client'
+import { SuiteFailedEmail } from '../resend/emails/SuiteFailedEmail'
 import type { TestDefinition } from '../testing/engine'
 import { getTaskPrompt, getTaskResponse, RESPONSE_JSON_SCHEMA } from '../testing/engine'
 import { ExhaustiveSwitchCheck } from '../types'
 import { inngest } from './client'
+
+// Functions -----------------------------------------------------------------
 
 /**
  * Utility function to test the Inngest connection.
@@ -91,8 +95,12 @@ export const runTestSuite = inngest.createFunction(
     )
 
     await step.run(`finalize-suite-run`, _finalizeSuiteRun, { suiteId: event.data.suiteRunId, testRunIds })
+
+    await step.run(`send-suite-notification`, _sendSuiteNotification, { suiteRunId: event.data.suiteRunId })
   },
 )
+
+// Steps ---------------------------------------------------------------------
 
 /**
  * Start a new agent test run and return the ID of the test run.
@@ -317,9 +325,7 @@ async function _finalizeTestRun({ testRunId }: { testRunId: number }) {
 }
 
 async function _finalizeSuiteRun({ suiteId, testRunIds }: { suiteId: number; testRunIds: number[] }) {
-  const dbTestRuns = await db.query.testRun.findMany({
-    where: inArray(schema.suiteRun.id, testRunIds),
-  })
+  const dbTestRuns = await db.query.testRun.findMany({ where: inArray(schema.suiteRun.id, testRunIds) })
 
   const hasFailed = dbTestRuns.some((result) => result.status === 'failed')
 
@@ -329,4 +335,61 @@ async function _finalizeSuiteRun({ suiteId, testRunIds }: { suiteId: number; tes
     .where(eq(schema.suiteRun.id, suiteId))
 
   return { hasFailed }
+}
+
+async function _sendSuiteNotification({ suiteRunId }: { suiteRunId: number }) {
+  const dbSuiteRun = await db.query.suiteRun.findFirst({
+    where: eq(schema.suiteRun.id, suiteRunId),
+    with: {
+      suite: true,
+      testRuns: {
+        with: {
+          test: true,
+        },
+      },
+    },
+  })
+
+  if (!dbSuiteRun) {
+    throw new NonRetriableError(`Suite run not found: ${suiteRunId}`)
+  }
+
+  if (dbSuiteRun.status !== 'failed' || dbSuiteRun.suite.notificationsEmailAddress == null) {
+    // NOTE: We don't send notifications for successful runs or if no email address is set.
+    return { sent: false }
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL
+  if (resend == null || !fromEmail) {
+    throw new NonRetriableError('Resend is not configured!')
+  }
+
+  const res = await resend.emails.send({
+    from: fromEmail,
+    to: dbSuiteRun.suite.notificationsEmailAddress,
+    subject: `Suite ${dbSuiteRun.suite.name} Failed (#${suiteRunId})`,
+    react: (
+      <SuiteFailedEmail
+        suiteId={dbSuiteRun.suite.id}
+        suiteName={dbSuiteRun.suite.name}
+        suiteDomain={dbSuiteRun.suite.domain}
+        suiteStartedAt={dbSuiteRun.createdAt}
+        suiteFinishedAt={dbSuiteRun.createdAt}
+        runs={dbSuiteRun.testRuns.map((testRun) => ({
+          runId: testRun.id,
+          runName: testRun.test.label,
+          runStatus: testRun.status,
+          runStartedAt: testRun.createdAt,
+          runFinishedAt: testRun.finishedAt,
+        }))}
+      />
+    ),
+  })
+
+  if (res.error) {
+    console.error(res)
+    throw new Error(`Failed to send email: ${JSON.stringify(res.error)}`)
+  }
+
+  return { sent: true }
 }

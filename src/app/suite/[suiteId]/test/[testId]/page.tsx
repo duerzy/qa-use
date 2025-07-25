@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { TestDetails } from '@/components/test/TestDetails'
 
-import { runTestAction } from './actions'
+import { deleteTestAction, runTestAction } from './actions'
 import { loader } from './loader'
 
 export default async function TestPage({ params }: { params: Promise<{ suiteId: string; testId: string }> }) {
@@ -21,6 +21,7 @@ export default async function TestPage({ params }: { params: Promise<{ suiteId: 
   }
 
   const runTest = runTestAction.bind(null, testIdNum)
+  const deleteTest = deleteTestAction.bind(null, testIdNum)
 
-  return <TestDetails test={test} runTest={runTest} />
+  return <TestDetails test={test} runTest={runTest} deleteTest={deleteTest} />
 }
