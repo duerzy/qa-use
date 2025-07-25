@@ -1,7 +1,10 @@
 import { Plus } from 'lucide-react'
-import { Suspense } from 'react'
+import Link from 'next/link'
+import { Fragment } from 'react'
 
-import { SuiteList } from '@/components/SuiteList'
+import { PageHeader } from '@/components/shared/PageHeader'
+import { SectionHeader } from '@/components/shared/SectionHeader'
+import { formatDate } from '@/components/shared/utils'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -12,6 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { createSuiteAction, seedSuiteAction } from './actions'
 import { loader } from './loader'
@@ -20,30 +24,58 @@ export default async function Page() {
   const suites = await loader()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <h1 className="text-5xl font-bold text-gray-900 mr-auto">QA-Use</h1>
+    <Fragment>
+      <PageHeader
+        title="All Suites"
+        subtitle="Use QA"
+        actions={[{ link: 'https://github.com/browser-use/use-qa', label: 'Star on GitHub' }]}
+      />
+      {/* Header */}
 
-          <CreateSuiteDialog />
+      {/* Suites List */}
 
-          <form action={seedSuiteAction}>
+      <SectionHeader
+        title="Test Suites"
+        actions={[
+          <CreateSuiteDialog key="create-suite-dialog" />,
+          <form key="seed-suite-form" action={seedSuiteAction}>
             <Button variant="outline" type="submit">
               Seed
             </Button>
-          </form>
-        </div>
+          </form>,
+        ]}
+      />
 
-        {/* Suites List */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Test Suites</h2>
-          <Suspense fallback={<div className="text-gray-500">Loading suites...</div>}>
-            <SuiteList data={suites} />
-          </Suspense>
-        </div>
-      </div>
-    </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Name</TableHead>
+            <TableHead>Domain</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>{/* Actions */}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {suites.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} className="">
+                No suites found
+              </TableCell>
+            </TableRow>
+          )}
+          {suites.map((suite) => (
+            <TableRow key={suite.id}>
+              <TableCell className="font-medium">{suite.name}</TableCell>
+              <TableCell>{suite.domain}</TableCell>
+              <TableCell>{formatDate(suite.createdAt)}</TableCell>
+              <TableCell className="text-right">
+                <Link href={`/suite/${suite.id}`}>View</Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Fragment>
   )
 }
 

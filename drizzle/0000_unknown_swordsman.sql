@@ -9,6 +9,8 @@ CREATE TABLE "suite" (
 CREATE TABLE "suite_run" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
+	"started_at" timestamp DEFAULT now(),
+	"finished_at" timestamp,
 	"suite_id" integer NOT NULL,
 	"status" "run_status" NOT NULL
 );
@@ -25,6 +27,8 @@ CREATE TABLE "test" (
 CREATE TABLE "test_run" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
+	"started_at" timestamp DEFAULT now(),
+	"finished_at" timestamp,
 	"test_id" integer NOT NULL,
 	"suite_run_id" integer NOT NULL,
 	"status" "run_status" NOT NULL,

@@ -2,40 +2,40 @@
 
 import Link from 'next/link'
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
 import type { TSuite } from '../../app/suite/[suiteId]/loader'
+import { formatDate } from '../shared/utils'
 
 export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number }) {
   return (
-    <div className="space-y-4">
-      {suite.tests.map((test) => (
-        <Link
-          key={test.id}
-          href={`/suite/${suiteId}/test/${test.id}`}
-          className="block bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:bg-gray-50 transition-colors"
-        >
-          <div className="w-full px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-900">{test.label}</h3>
-                <p className="text-sm text-gray-500" suppressHydrationWarning>
-                  {formatDate(test.createdAt)}
-                </p>
-                <p className="text-xs text-gray-400">{test.steps.length} steps</p>
-              </div>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
-  )
-}
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Test</TableHead>
+          <TableHead>Created At</TableHead>
+          <TableHead>{/* Actions */}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {suite.tests.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={4} className="">
+              No tests found
+            </TableCell>
+          </TableRow>
+        )}
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
+        {suite.tests.map((test) => (
+          <TableRow key={test.id}>
+            <TableCell>{test.label}</TableCell>
+            <TableCell suppressHydrationWarning>{formatDate(test.createdAt)}</TableCell>
+            <TableCell className="text-right">
+              <Link href={`/suite/${suiteId}/test/${test.id}`}>View</Link>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
 }

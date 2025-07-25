@@ -1,19 +1,20 @@
 'use server'
 
-import { eq } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 
 import { db } from '@/lib/db/db'
-import { suiteRun } from '@/lib/db/schema'
+import * as schema from '@/lib/db/schema'
 
 export async function loader({ suiteRunId }: { suiteRunId: number }) {
   const run = await db.query.suiteRun.findFirst({
-    where: eq(suiteRun.id, suiteRunId),
+    where: eq(schema.suiteRun.id, suiteRunId),
     with: {
       suite: true,
       testRuns: {
         with: {
           test: true,
         },
+        orderBy: [asc(schema.testRun.createdAt)],
       },
     },
   })

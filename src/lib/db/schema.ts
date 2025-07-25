@@ -83,9 +83,21 @@ export const runStatus = pgEnum('run_status', [
   'failed',
 ])
 
+export type TRunStatus = (typeof runStatus.enumValues)[number]
+
 export const suiteRun = pgTable('suite_run', {
   id: serial('id').primaryKey(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+
+  /**
+   * The time the run started.
+   */
+  startedAt: timestamp('started_at').defaultNow(),
+
+  /**
+   * The time the run finished.
+   */
+  finishedAt: timestamp('finished_at'),
 
   suiteId: integer('suite_id')
     .references(() => suite.id, { onDelete: 'cascade' })
@@ -106,6 +118,16 @@ export const testRun = pgTable('test_run', {
   id: serial('id').primaryKey(),
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
+
+  /**
+   * The time the run started.
+   */
+  startedAt: timestamp('started_at').defaultNow(),
+
+  /**
+   * The time the run finished.
+   */
+  finishedAt: timestamp('finished_at'),
 
   /**
    * The ID of the test this run belongs to.

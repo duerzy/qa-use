@@ -1,21 +1,16 @@
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 
 import type { TSuiteRun } from '@/app/suite/[suiteId]/run/[suiteRunId]/loader'
 import { Polling } from '@/components/Polling'
+import { PageHeader } from '@/components/shared/PageHeader'
+import { RunStatusBadge } from '@/components/shared/RunStatusBadge'
+import { RunStatusIcon } from '@/components/shared/RunStatusIcon'
+import { SectionHeader } from '@/components/shared/SectionHeader'
+import { formatDate } from '@/components/shared/utils'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
-  function formatDate(date: Date | string) {
-    const d = typeof date === 'string' ? new Date(date) : date
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(d)
-  }
-
   const { nOfPassingTests, nOfFailedTests } = useMemo(() => {
     return run.testRuns.reduce(
       (acc, testRun) => {
@@ -28,68 +23,55 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
   }, [run.testRuns])
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex gap-4 items-baseline">
-          <div className="mr-auto">
-            <Link href={`/suite/${run.suite.id}`} className="text-sm text-gray-500">
-              Back to suite
-            </Link>
-            <h2 className="text-4xl font-semibold text-gray-900 mt-2">Suite Run #{run.id}</h2>
-            <h3 className="text-2xl text-gray-500 mt-1">{run.suite.name}Suite</h3>
-          </div>
+    <Fragment>
+      <PageHeader
+        title={`Suite Run #${run.id}`}
+        subtitle={run.suite.name}
+        back={{ href: `/suite/${run.suite.id}`, label: 'Back to Suite' }}
+      />
 
-          <StatusBadge status={run.status} />
-        </div>
+      <SectionHeader
+        title="Test Runs"
+        actions={[
+          <p key="test-runs-status" className="text-gray-500 text-sm font-medium ml-4">
+            {nOfPassingTests} passed, {nOfFailedTests} failed
+          </p>,
+          <RunStatusBadge key="test-runs-status-badge" status={run.status} />,
+        ]}
+      />
 
-        {/* Test Runs List */}
-        <div className="py-8">
-          <div className="flex items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mr-auto">Test Runs</h3>
-
-            <p>
-              {nOfPassingTests} passed, {nOfFailedTests} failed
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {run.testRuns.map((testRun) => (
-              <Link
-                key={testRun.id}
-                href={`/suite/${run.suite.id}/test/${testRun.testId}/run/${testRun.id}`}
-                className="block border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-gray-900">{testRun.test.label}</div>
-                    <div className="text-sm text-gray-500" suppressHydrationWarning>
-                      Created: {formatDate(testRun.createdAt)}
-                    </div>
-                  </div>
-                  <StatusBadge status={testRun.status} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Test</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead>{/* Actions */}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {run.testRuns.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} className="">
+                No suites found
+              </TableCell>
+            </TableRow>
+          )}
+          {run.testRuns.map((testRun) => (
+            <TableRow key={testRun.id}>
+              <TableCell className="font-medium flex items-center gap-2">
+                <RunStatusIcon status={testRun.status} />
+                {testRun.test.label}
+              </TableCell>
+              <TableCell suppressHydrationWarning>{formatDate(testRun.createdAt)}</TableCell>
+              <TableCell className="text-right">
+                <Link href={`/suite/${run.suite.id}/test/${testRun.testId}/run/${testRun.id}`}>View</Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <Polling poll={run.status === 'running' || run.status === 'pending'} />
-    </div>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  let color = 'bg-gray-100 text-gray-800'
-  if (status === 'passed') color = 'bg-green-100 text-green-800'
-  else if (status === 'failed') color = 'bg-red-100 text-red-800'
-  else if (status === 'running') color = 'bg-blue-100 text-blue-800'
-  else if (status === 'pending') color = 'bg-gray-100 text-gray-800'
-
-  return (
-    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${color}`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
+    </Fragment>
   )
 }

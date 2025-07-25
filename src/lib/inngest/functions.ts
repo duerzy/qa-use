@@ -39,6 +39,7 @@ export const runTestSuite = inngest.createFunction(
 
       await step.run('update-suite-run-status', async () => {
         await db.update(schema.suiteRun).set({ status: 'failed' }).where(eq(schema.suiteRun.id, suiteRunId))
+        await db.update(schema.testRun).set({ status: 'failed' }).where(eq(schema.testRun.suiteRunId, suiteRunId))
       })
     },
   },
@@ -111,14 +112,23 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
-      // allowed_domains: [dbTestRun.test.suite.domain],
+      allowed_domains: [dbTestRun.test.suite.domain],
       structured_output_json: JSON.stringify(RESPONSE_JSON_SCHEMA),
     },
   })
 
   if (!buTaskResponse.data) {
-    throw new RetryAfterError('Failed to start browser task', 1_000)
+    throw new RetryAfterError('Failed to start browser task', 1_000, {
+      cause: new Error(JSON.stringify(buTaskResponse.error)),
+    })
   }
+
+  await db
+    .update(schema.suiteRun)
+    .set({
+      status: 'running',
+    })
+    .where(eq(schema.suiteRun.id, dbTestRun.suiteRunId))
 
   await db
     .update(schema.testRun)
@@ -168,6 +178,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
             await tx
               .update(schema.testRun)
               .set({
+                finishedAt: new Date(),
                 status: 'passed',
                 error: null,
                 publicShareUrl: buTaskResponse.data.public_share_url,
@@ -190,6 +201,7 @@ async function _pollTaskUntilFinished({ testRunId }: { testRunId: number }) {
             await tx
               .update(schema.testRun)
               .set({
+                finishedAt: new Date(),
                 status: 'failed',
                 error: taskResult.error,
                 publicShareUrl: buTaskResponse.data.public_share_url,

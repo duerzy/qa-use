@@ -1,5 +1,5 @@
 {
-  "id": "3d9e5c8a-add3-48ee-a684-71ee2cad865e",
+  "id": "f958ebed-6ec4-405b-b868-19f8baec5c46",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -58,6 +58,19 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "suite_id": {
           "name": "suite_id",
@@ -175,6 +188,19 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "test_id": {
           "name": "test_id",
