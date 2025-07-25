@@ -98,7 +98,7 @@ export async function createTestAction(suiteId: number, formData: FormData) {
     .returning()
 
   revalidatePath(`/suite/${suiteId}`)
-  redirect(`/suite/${suiteId}/test/${newTest.id}`, RedirectType.push)
+  redirect(`/suite/${suiteId}/test/${newTest.id}/edit`, RedirectType.push)
 }
 
 export async function deleteSuiteAction(suiteId: number) {

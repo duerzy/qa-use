@@ -112,7 +112,7 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
-      allowed_domains: [dbTestRun.test.suite.domain],
+      allowed_domains: [`*.${dbTestRun.test.suite.domain}`],
       structured_output_json: JSON.stringify(RESPONSE_JSON_SCHEMA),
     },
   })
