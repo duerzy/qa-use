@@ -4,13 +4,12 @@ import { createTest } from '@/lib/testing/engine'
 export const DOCS_PASSING_SEARCH_TEST: TestDefinition = createTest({
   label: 'Passing BrowserUse Docs Search',
   steps: [
+    //
     'Go to docs.browser-use.com',
-    'Find the search input in the header.',
-    'Type "API" into the search input.',
-    'Press enter or click the search button.',
+    'Click on Cloud API V1 documentation.',
+    'Select Run Task Documentation.',
   ],
-  evaluation:
-    'The page should show search results related to "API", and at least one result should mention "Implementing the API".',
+  evaluation: 'The page needs to show POST request that lets you run a task using the Cloud API.',
 })
 
 /**
@@ -19,12 +18,12 @@ export const DOCS_PASSING_SEARCH_TEST: TestDefinition = createTest({
 export const DOCS_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
   label: 'Failing Evaluation BrowserUse Docs Search',
   steps: [
+    //
     'Go to docs.browser-use.com',
-    'Find the search input in the header.',
-    'Type "API" into the search input.',
-    'Press enter or click the search button.',
+    'Click on Cloud API V1 documentation.',
+    'Select Run Task Documentation.',
   ],
-  evaluation: 'The page should display an error message saying "No results found for API".',
+  evaluation: 'The page needs to show a cooking recipe for "Pasta Carbonara".',
 })
 
 /**
@@ -33,12 +32,12 @@ export const DOCS_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
 export const DOCS_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
   label: 'Failing Test BrowserUse Docs Search',
   steps: [
+    //
     'Go to docs.browser-use.com',
-    'Click edit documentation button in the top right corner.',
-    'Edit the documentation title to "Moonbase".',
-    'Click save button.',
+    'Click on Cloud API V2 documentation.',
+    'Select "Create AGI Agent" documentation.',
   ],
-  evaluation: 'The page should show the documentation title "Moonbase".',
+  evaluation: 'The page needs to show detailed guide on how to create an AGI Agent using the Cloud API.',
 })
 
 export const BROWSERUSE_DOCS_TEST_SUITE: TestSuiteDefinition = {
