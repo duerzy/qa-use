@@ -4,6 +4,8 @@ import { TestRunDetails } from '@/components/test/run/TestRunDetails'
 
 import { loader } from './loader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TestRunPage({ params }: { params: Promise<{ suiteId: string; testRunId: string }> }) {
   const { suiteId, testRunId } = await params
 

@@ -316,8 +316,8 @@ async function _finalizeTestRun({ testRunId }: { testRunId: number }) {
   await db
     .update(schema.testRun)
     .set({
-      finishedAt: new Date(),
       status: hasFailed ? 'failed' : 'passed',
+      finishedAt: new Date(),
     })
     .where(eq(schema.testRun.id, testRunId))
 
@@ -331,7 +331,10 @@ async function _finalizeSuiteRun({ suiteId, testRunIds }: { suiteId: number; tes
 
   await db
     .update(schema.suiteRun)
-    .set({ status: hasFailed ? 'failed' : 'passed' })
+    .set({
+      status: hasFailed ? 'failed' : 'passed',
+      finishedAt: new Date(),
+    })
     .where(eq(schema.suiteRun.id, suiteId))
 
   return { hasFailed }

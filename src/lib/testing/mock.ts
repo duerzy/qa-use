@@ -1,56 +1,53 @@
 import type { TestDefinition, TestSuiteDefinition } from '@/lib/testing/engine'
 import { createTest } from '@/lib/testing/engine'
 
-export const SKYSCANNER_PASSING_SEARCH_TEST: TestDefinition = createTest({
-  label: 'Passing Skyscanner Search',
+export const DOCS_PASSING_SEARCH_TEST: TestDefinition = createTest({
+  label: 'Passing BrowserUse Docs Search',
   steps: [
-    'Go to skyscanner.com',
-    'Select One-Way Flights',
-    'Select Zurich as departure location.',
-    'Select Ljubljana as destination.',
-    'Pick flight date to be tomorrow.',
-    'Select one passenger option and click apply',
-    'Click search',
+    'Go to docs.browser-use.com',
+    'Find the search input in the header.',
+    'Type "API" into the search input.',
+    'Press enter or click the search button.',
   ],
   evaluation:
-    'The app should end on the results page showing at least one flight result going from Zurich to Ljubljana',
+    'The page should show search results related to "API", and at least one result should mention "Implementing the API".',
 })
 
-export const SKYSCANNER_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
-  label: 'Failing Evaluation Skyscanner Search',
+/**
+ * A test example that fails because the evaluation is not met.
+ */
+export const DOCS_FAILING_EVAL_SEARCH_TEST: TestDefinition = createTest({
+  label: 'Failing Evaluation BrowserUse Docs Search',
   steps: [
-    'Go to skyscanner.com',
-    'Select One-Way Flights',
-    'Select Zurich as departure location.',
-    'Select Ljubljana as destination.',
-    'Pick flight date to be tomorrow.',
-    'Select one passenger option and click apply',
-    'Click search',
+    'Go to docs.browser-use.com',
+    'Find the search input in the header.',
+    'Type "API" into the search input.',
+    'Press enter or click the search button.',
   ],
-  evaluation: 'The app should end on the results page showing "Wrong date" error.',
+  evaluation: 'The page should display an error message saying "No results found for API".',
 })
 
-export const SKYSCANNER_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
-  label: 'Failing Test Skyscanner Search',
+/**
+ * A test example that fails because the test step cannot be completed.
+ */
+export const DOCS_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
+  label: 'Failing Test BrowserUse Docs Search',
   steps: [
-    'Go to skyscanner.com',
-    'Select One-Way Flights',
-    'Select Zurich as departure location.',
-    'Select moon as destination.',
-    'Pick flight date to be tomorrow.',
-    'Select one passenger option and click apply',
-    'Click search',
+    'Go to docs.browser-use.com',
+    'Click edit documentation button in the top right corner.',
+    'Edit the documentation title to "Moonbase".',
+    'Click save button.',
   ],
-  evaluation: 'The app should end on the results page showing at least one flight result going from Zurich to moon',
+  evaluation: 'The page should show the documentation title "Moonbase".',
 })
 
-export const SKYSCANNER_TEST_SUITE: TestSuiteDefinition = {
-  label: 'Skyscanner',
-  domain: 'skyscanner.com',
+export const BROWSERUSE_DOCS_TEST_SUITE: TestSuiteDefinition = {
+  label: 'BrowserUse Docs',
+  domain: 'docs.browser-use.com',
   tests: [
     //
-    SKYSCANNER_PASSING_SEARCH_TEST,
-    SKYSCANNER_FAILING_EVAL_SEARCH_TEST,
-    SKYSCANNER_FAILING_TEST_SEARCH_TEST,
+    DOCS_PASSING_SEARCH_TEST,
+    DOCS_FAILING_EVAL_SEARCH_TEST,
+    DOCS_FAILING_TEST_SEARCH_TEST,
   ],
 }

@@ -11,6 +11,8 @@ import {
 } from './actions'
 import { loader } from './loader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SuitePage({ params }: { params: Promise<{ suiteId: string }> }) {
   const { suiteId } = await params
   const suiteIdNum = parseInt(suiteId, 10)

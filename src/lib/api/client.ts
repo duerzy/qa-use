@@ -1,6 +1,6 @@
 import createClient from 'openapi-fetch'
 
-import { paths } from '@/lib/api/v1'
+import type { paths } from '@/lib/api/v1'
 
 export type Client = ReturnType<typeof createClient<paths>>
 

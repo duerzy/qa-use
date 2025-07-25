@@ -20,6 +20,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { createSuiteAction, seedSuiteAction } from './actions'
 import { loader } from './loader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   const suites = await loader()
 

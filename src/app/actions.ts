@@ -6,7 +6,10 @@ import z from 'zod/v4'
 
 import { db } from '@/lib/db/db'
 import * as schema from '@/lib/db/schema'
-import { SKYSCANNER_TEST_SUITE } from '@/lib/testing/mock'
+import type { TestSuiteDefinition } from '@/lib/testing/engine'
+import { BROWSERUSE_DOCS_TEST_SUITE } from '@/lib/testing/mock'
+
+const MOCK_SUITE: TestSuiteDefinition = BROWSERUSE_DOCS_TEST_SUITE
 
 const zCreateSuite = z.object({
   name: z.string().min(1),
@@ -36,7 +39,7 @@ export async function seedSuiteAction() {
   // Insert the suite
   const [insertedSuite] = await db
     .insert(schema.suite)
-    .values({ name: SKYSCANNER_TEST_SUITE.label, domain: SKYSCANNER_TEST_SUITE.domain })
+    .values({ name: MOCK_SUITE.label, domain: MOCK_SUITE.domain })
     .returning()
 
   if (!insertedSuite) {
@@ -44,7 +47,7 @@ export async function seedSuiteAction() {
   }
 
   // Insert tests and steps
-  for (const test of SKYSCANNER_TEST_SUITE.tests) {
+  for (const test of MOCK_SUITE.tests) {
     const [insertedTest] = await db
       .insert(schema.test)
       .values({

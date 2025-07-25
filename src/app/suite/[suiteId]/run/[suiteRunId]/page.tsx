@@ -4,6 +4,8 @@ import { SuiteRunDetails } from '@/components/suite/run/SuiteRunDetails'
 
 import { loader } from './loader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SuiteRunPage({ params }: { params: Promise<{ suiteId: string; suiteRunId: string }> }) {
   const { suiteRunId } = await params
   const suiteRunIdNum = parseInt(suiteRunId, 10)

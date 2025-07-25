@@ -1,6 +1,7 @@
 'use client'
 
-import { Check, Trash2 } from 'lucide-react'
+import { Check, Save, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { Fragment, useMemo, useReducer } from 'react'
 
 import { saveTest } from '@/app/suite/[suiteId]/test/[testId]/edit/actions'
@@ -189,11 +190,19 @@ export function TestEditor({ test }: { test: TTest }) {
         </div>
       </div>
 
-      <form action={action} className="mt-5">
-        <Button className="w-full" type="submit" disabled={state.steps.length === 0}>
-          Save
-        </Button>
-      </form>
+      <div className="mt-5 flex gap-3 w-full">
+        <Link href={`/suite/${test.suiteId}/test/${test.id}`} className="flex-1">
+          <Button variant="outline" className="w-full">
+            Cancel
+          </Button>
+        </Link>
+        <form action={action} className="flex-1">
+          <Button className="w-full" type="submit" disabled={state.steps.length === 0}>
+            <Save className="w-4 h-4" />
+            Save
+          </Button>
+        </form>
+      </div>
     </Fragment>
   )
 }

@@ -5,6 +5,8 @@ import { TestDetails } from '@/components/test/TestDetails'
 import { deleteTestAction, runTestAction } from './actions'
 import { loader } from './loader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TestPage({ params }: { params: Promise<{ suiteId: string; testId: string }> }) {
   const { suiteId, testId } = await params
   const suiteIdNum = parseInt(suiteId, 10)
