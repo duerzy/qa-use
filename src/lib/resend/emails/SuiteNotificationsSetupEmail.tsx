@@ -20,7 +20,7 @@ export function SuiteNotificationsSetupEmail({
       <h1>Suite Notifications Setup - {suiteName}</h1>
       <h2>{suiteDomain}</h2>
 
-      <p>Use QA will send you an email if the suite fails to {suiteNotificationsEmailAddress}!</p>
+      <p>QA Use will send you an email if the suite fails to {suiteNotificationsEmailAddress}!</p>
     </div>
   )
 }

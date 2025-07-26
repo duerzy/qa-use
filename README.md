@@ -1,4 +1,4 @@
-# 🎯 Use QA
+# 🎯 QA Use
 
 **AI-Powered E2E Testing Platform** ✨
 
@@ -9,43 +9,6 @@
 <p align="center">
   <img src="media/run.png" alt="Test Run in Progress" width="600px">
 </p>
-
-## ✨ Key Features & Highlights
-
-### 🤖 **AI-Powered Testing Engine**
-
-- **Intelligent Agents**: Leverages BrowserUse with GPT-4o/o3 models for human-like testing
-- **Natural Language Tests**: Write test cases in plain English—no complex selectors needed
-- **Smart Evaluation**: AI agents validate end states against success criteria with precision
-- **Adaptive Execution**: Handles dynamic content, popups, and unexpected UI changes
-
-### 🎯 **Advanced Test Management**
-
-- **Test Suites**: Organize related tests into logical groups by domain or feature
-- **Step-by-Step Definitions**: Break down complex user journeys into clear, actionable steps
-- **Visual Test Editor**: Intuitive interface for creating and managing test scenarios
-- **Flexible Evaluation**: Define custom success criteria for any testing scenario
-
-### ⏰ **Automated Scheduling & Monitoring**
-
-- **Cron Integration**: Schedule test runs hourly, daily, or on custom intervals
-- **Real-time Execution**: Watch your tests run live with detailed step-by-step progress
-- **Complete Audit Trail**: Full history of all test runs with timestamps and results
-- **Status Tracking**: Monitor test suite health with comprehensive dashboards
-
-### 📧 **Smart Notifications**
-
-- **Instant Alerts**: Get notified immediately when tests fail via email
-- **Failure Details**: Receive detailed error reports with context and screenshots
-- **Team Collaboration**: Share test results and failures with your entire team
-- **Customizable Recipients**: Configure notifications per test suite
-
-### 🛡️ **Enterprise-Grade Security**
-
-- **Domain Restrictions**: Limit AI agents to specific allowed domains
-- **Proxy Support**: Built-in proxy integration for secure testing
-- **Ad Blocker**: Clean testing environment without distractions
-- **Encrypted Storage**: Secure handling of sensitive test data
 
 ## 🚀 Quick Start Guide
 
@@ -59,8 +22,8 @@
 
 ```bash
 # 1️⃣ Clone the repository
-git clone https://github.com/browser-use/use-qa.git
-cd use-qa
+git clone https://github.com/browser-use/qa-use.git
+cd qa-use
 
 # 2️⃣ Configure environment variables
 cp .env.example .env
@@ -69,6 +32,14 @@ cp .env.example .env
 # 3️⃣ Launch the platform
 docker compose up
 ```
+
+## ✨ Key Features & Highlights
+
+1. 🤖 **AI-Powered Testing Engine** - Leverages BrowserUse to evaluate test cases in plain English.
+1. 🎯 **Advanced Test Management** - Organize tests into suites and run multiple tests in parallel.
+1. ⏰ **Automated Scheduling & Monitoring** - Configure suites to run hourly or daily automatically.
+1. 📧 **Smart Notifications** - Get an email notification when a test suite fails.
+1. 🛡️ **Enterprise-Grade Security** - Restrict the tests to only run on your domain.
 
 🎉 **That's it!** Visit [http://localhost:3000](http://localhost:3000) to start creating your first test suite.
 
@@ -124,73 +95,6 @@ INNGEST_BASE_URL=http://inngest:8288
    - Provides detailed pass/fail reports
    - Captures screenshots and recordings
 
-### 🔄 **Automated Workflows**
-
-- **Continuous Monitoring**: Schedule tests to run automatically
-- **Failure Detection**: Instant alerts when something breaks
-- **Historical Analysis**: Track test reliability over time
-- **Team Notifications**: Keep everyone informed of system health
-
-## 🎯 Perfect Use Cases
-
-### 🛒 **E-Commerce Testing**
-
-- Product search and filtering
-- Shopping cart functionality
-- Checkout process validation
-- User account management
-
-### 📊 **SaaS Application Testing**
-
-- User onboarding flows
-- Feature functionality checks
-- Integration testing
-- Performance monitoring
-
-### 🏢 **Enterprise Workflows**
-
-- Critical business processes
-- Compliance validation
-- Multi-step form submissions
-- Dashboard and reporting features
-
-### 🔄 **Regression Testing**
-
-- Pre-deployment validation
-- Release confidence checks
-- Cross-browser compatibility
-- Mobile responsiveness testing
-
-## 🚀 Getting Started with Your First Test
-
-### 1. **Create a Test Suite**
-
-- Navigate to the dashboard
-- Click "Create Suite"
-- Set your application domain (e.g., `example.com`)
-- Configure notification preferences
-
-### 2. **Add Your First Test**
-
-- Click "Add Test" in your suite
-- Write a descriptive test name
-- Add step-by-step instructions
-- Define success criteria
-
-### 3. **Run and Monitor**
-
-- Hit "Run Test" to execute immediately
-- Watch the live execution in real-time
-- Review results and recordings
-- Set up automated scheduling
-
-### 4. **Scale Your Testing**
-
-- Add more tests to your suite
-- Configure cron schedules
-- Set up team notifications
-- Monitor long-term trends
-
 ## 🤝 Contributing
 
 We welcome contributions! This project showcases the full capabilities of BrowserUse and serves as a reference implementation for AI-powered testing platforms.
@@ -222,6 +126,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Built with ❤️ by the BrowserUse team**
 
-[⭐ Star on GitHub](https://github.com/browser-use/use-qa) • [🐛 Report Bug](https://github.com/browser-use/use-qa/issues) • [💡 Request Feature](https://github.com/browser-use/use-qa/issues)
+[⭐ Star on GitHub](https://github.com/browser-use/qa-use) • [🐛 Report Bug](https://github.com/browser-use/qa-use/issues) • [💡 Request Feature](https://github.com/browser-use/qa-use/issues)
 
 </div>

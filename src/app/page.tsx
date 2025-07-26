@@ -29,8 +29,8 @@ export default async function Page() {
     <Fragment>
       <PageHeader
         title="All Suites"
-        subtitle="Use QA"
-        actions={[{ link: 'https://github.com/browser-use/use-qa', label: 'Star on GitHub' }]}
+        subtitle="QA Use"
+        actions={[{ link: 'https://github.com/browser-use/qa-use', label: 'Star on GitHub' }]}
       />
       {/* Header */}
 

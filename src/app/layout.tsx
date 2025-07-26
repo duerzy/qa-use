@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Browser Use | Use QA',
+  title: 'Browser Use | QA Use',
   description: 'Create delightful browser tests with ease!',
 }
 

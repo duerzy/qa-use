@@ -33,7 +33,7 @@ export function SuiteFailedEmail({
 }: EmailTemplateProps) {
   return (
     <div>
-      <h1>Use QA - Suite {suiteName} failed!</h1>
+      <h1>QA Use - Suite {suiteName} failed!</h1>
       <h2>{suiteDomain}</h2>
 
       <p>Suite started at {suiteStartedAt.toLocaleString()}</p>
