@@ -15,7 +15,7 @@
 ### Prerequisites
 
 - 🐳 **Docker** & Docker Compose installed
-- 🔑 **BrowserUse API Key** (get yours at [browser-use.com](https://browser-use.com))
+- 🔑 **BrowserUse API Key** (get yours at [cloud.browser-use.com](https://cloud.browser-use.com/billing))
 - 📧 **Resend API Key** (optional, for email notifications)
 
 ### ⚡ 3-Step Setup
