@@ -129,7 +129,11 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
   const definition: TestDefinition = {
     evaluation: dbTestRun.test.evaluation,
     label: dbTestRun.test.label,
-    steps: dbTestRun.test.steps,
+    steps: dbTestRun.test.steps.map((step) => ({
+      id: step.id,
+      label: `${step.order}`,
+      description: step.description,
+    })),
   }
 
   // Start browser task
@@ -147,7 +151,6 @@ async function _startTestRun({ testRunId }: { testRunId: number }): Promise<numb
       use_adblock: true,
       use_proxy: true,
       max_agent_steps: 10,
-      allowed_domains: [`*.${dbTestRun.test.suite.domain}`],
       structured_output_json: JSON.stringify(RESPONSE_JSON_SCHEMA),
     },
   })
@@ -375,7 +378,6 @@ async function _sendSuiteNotification({ suiteRunId }: { suiteRunId: number }) {
       <SuiteFailedEmail
         suiteId={dbSuiteRun.suite.id}
         suiteName={dbSuiteRun.suite.name}
-        suiteDomain={dbSuiteRun.suite.domain}
         suiteStartedAt={dbSuiteRun.createdAt}
         suiteFinishedAt={dbSuiteRun.createdAt}
         runs={dbSuiteRun.testRuns.map((testRun) => ({

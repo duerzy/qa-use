@@ -1,6 +1,6 @@
 'use server'
 
-import { desc, eq } from 'drizzle-orm'
+import { asc, desc, eq } from 'drizzle-orm'
 
 import { db } from '@/lib/db/db'
 import * as schema from '@/lib/db/schema'
@@ -13,7 +13,7 @@ export async function loader(suiteId: number) {
         with: {
           steps: true,
         },
-        orderBy: [schema.test.createdAt],
+        orderBy: [asc(schema.test.id)],
       },
       runs: {
         with: {

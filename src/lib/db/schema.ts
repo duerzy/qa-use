@@ -10,11 +10,6 @@ export const suite = pgTable('suite', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 
   /**
-   * The domain of the application under test.
-   */
-  domain: text('domain').notNull(),
-
-  /**
    * The cadence of the cron job. If not set, the suite will not be run by cron.
    */
   cronCadence: cronCadence('cron_cadence'),

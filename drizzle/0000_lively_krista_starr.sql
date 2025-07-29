@@ -1,9 +1,12 @@
+CREATE TYPE "public"."cron_cadence" AS ENUM('hourly', 'daily');--> statement-breakpoint
 CREATE TYPE "public"."run_status" AS ENUM('pending', 'running', 'passed', 'failed');--> statement-breakpoint
 CREATE TABLE "suite" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"domain" text NOT NULL
+	"cron_cadence" "cron_cadence",
+	"last_cron_run_at" timestamp,
+	"notifications_email_address" text
 );
 --> statement-breakpoint
 CREATE TABLE "suite_run" (

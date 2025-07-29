@@ -27,28 +27,37 @@ export async function saveTest(id: number, test: State, _: FormData): Promise<vo
     })
     .where(eq(schema.test.id, id))
 
+  let order = 1
+
   for (const step of steps) {
     switch (step.status) {
       case 'new': {
         await db.insert(schema.testStep).values({
           testId: id,
           description: step.description,
-          order: step.order,
+          order: order,
         })
+
+        order++
         break
       }
 
       case 'existing': {
         if (step.deleted) {
           await db.delete(schema.testStep).where(eq(schema.testStep.id, step.sourceId))
+
+          // NOTE: We don't need to update the order because the order is not used for deleted steps.
           break
         } else {
           await db
             .update(schema.testStep)
             .set({
               description: step.description,
+              order,
             })
             .where(eq(schema.testStep.id, step.sourceId))
+
+          order++
         }
         break
       }

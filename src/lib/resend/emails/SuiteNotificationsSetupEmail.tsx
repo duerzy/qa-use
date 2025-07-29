@@ -3,7 +3,6 @@ import * as React from 'react'
 type SuiteNotificationsSetupEmailProps = {
   suiteId: number
   suiteName: string
-  suiteDomain: string
   suiteNotificationsEmailAddress: string | null
 }
 
@@ -12,15 +11,19 @@ type SuiteNotificationsSetupEmailProps = {
  */
 export function SuiteNotificationsSetupEmail({
   suiteName,
-  suiteDomain,
   suiteNotificationsEmailAddress,
 }: SuiteNotificationsSetupEmailProps) {
   return (
     <div>
-      <h1>Suite Notifications Setup - {suiteName}</h1>
-      <h2>{suiteDomain}</h2>
+      <h1>Suite Notifications Setup Success - {suiteName}</h1>
 
-      <p>QA Use will send you an email if the suite fails to {suiteNotificationsEmailAddress}!</p>
+      <p>
+        This email is to confirm that QA Use will send you an email if the suite fails. You can change this in the suite
+        settings.
+        <br />
+        <br />
+        <strong>Email address:</strong> {suiteNotificationsEmailAddress}
+      </p>
     </div>
   )
 }

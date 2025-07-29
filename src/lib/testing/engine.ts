@@ -57,7 +57,7 @@ export type TestDefinition = {
   /**
    * The steps you need to take to get there.
    */
-  steps: { id: number; description: string }[]
+  steps: { id: number; label: string; description: string }[]
 
   /**
    * The success criteria for the final state of the application.
@@ -67,8 +67,6 @@ export type TestDefinition = {
 
 export type TestSuiteDefinition = {
   label: string
-
-  domain: string
 
   /**
    * The tests to run.
@@ -124,7 +122,7 @@ ${JSON.stringify(RESPONSE_JSON_SCHEMA, null, 2)}
 
 Return \`{ status: "pass", steps: undefined, error: undefined }\` if you can successfully perform the task.
 
-Return \`{ status: "failing", steps: [ { id: <number>, description: "<action that was taken>" } ], error: "<error message>" }\` if you cannot successfully perform the test. The steps array contains exactly the steps that were successfully performed and nothing more. If you cannot perform a step, the error message contains information about why the step failed. If the final state does not match the success criteria, the error message is a detailed short description explaining what is different on the actual application compared to the expected application state and success criteria.
+Return \`{ status: "failing", steps: [ { id: <number>, description: "<action that was taken>" } ], error: "<error message>" }\` if you cannot successfully perform the test. The steps array contains exactly the steps that were successfully performed and nothing more. If you cannot perform a step, the error message contains information about why the step failed and reference the step label. If the final state does not match the success criteria, the error message is a detailed short description explaining what is different on the actual application compared to the expected application state and success criteria.
 
 Additionally:
 
@@ -146,7 +144,7 @@ The task will be given in the following format:
 \`\`\`
 <test>
   <steps>
-    <step id="...">
+    <step id="..." label="...">
       The step description..
     </step>
   </steps>
@@ -163,10 +161,10 @@ The task will be given in the following format:
 \`\`\`
 <test>
   <steps>
-    <step id="1">Go to the example.com website</step>
-    <step id="2">Type in "London" in the search input</step>
-    <step id="3">Click the search button</step>
-    <step id="4">The app should show a list of results</step>
+    <step id="id1" label="1">Go to the example.com website</step>
+    <step id="id2" label="2">Type in "London" in the search input</step>
+    <step id="id3" label="3">Click the search button</step>
+    <step id="id4" label="4">The app should show a list of results</step>
   </steps>
   <evaluation>The app should show at least one result in the search results page</evaluation>
 </test>
@@ -178,20 +176,40 @@ The task will be given in the following format:
 { "status": "pass", "steps": null, "error": null }
 \`\`\`
 
-# Example Failed Response
+# Example Failed Responses
 
 \`\`\`
-{ "status": "failing", "steps": [ { "id": "1", "description": "Go to the search page" } ], "error": "The search page is not found" }
+{ "status": "failing", "steps": [ { "id": "id1", "description": "Go to the search page" } ], "error": "Could not complete step 2 because there was no search input on example.com." }
+\`\`\`
+
+\`\`\`
+{ "status": "failing", "steps": [], "error": "Could not complete step 1 because I couldn't find example.com." }
+\`\`\`
+
+
+\`\`\`
+{ 
+  "status": "failing", 
+  "steps": [
+    { "id": "id1", "description": "Go to the search page" },
+    { "id": "id2", "description": "Type in 'London' in the search input" },
+    { "id": "id3", "description": "Click the search button" }
+  ], 
+  "error": "Could not complete step 4 because the app is not showing any results." 
+}
 \`\`\`
 
 
 `
 
+/**
+ * Formats a test definition into a string that can be used by an LLM.
+ */
 function stringifyTest(test: TestDefinition) {
   return `
 <test>
   <steps>
-    ${test.steps.map((step) => `<step id="${step.id}">${step.description}</step>`).join('\n')}
+    ${test.steps.map((step) => `<step id="${step.id}" label="${step.label}">${step.description}</step>`).join('\n')}
   </steps>
   <evaluation>${test.evaluation}</evaluation>
 </test>
@@ -211,21 +229,14 @@ ${stringifyTest(test)}
 `
 }
 
-/**
- * Lets you create a test definition.
- */
-export function createTest({
-  label,
-  steps,
-  evaluation,
-}: {
-  label: string
-  steps: string[]
-  evaluation: string
-}): TestDefinition {
+export function createTest(test: { label: string; steps: string[]; evaluation: string }): TestDefinition {
   return {
-    label,
-    steps: steps.map((step, index) => ({ id: index + 1, description: step })),
-    evaluation,
+    label: test.label,
+    steps: test.steps.map((step, index) => ({
+      id: index,
+      label: `${index + 1}`,
+      description: step,
+    })),
+    evaluation: test.evaluation,
   }
 }

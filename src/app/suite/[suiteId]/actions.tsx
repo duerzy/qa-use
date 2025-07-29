@@ -173,7 +173,6 @@ export async function setNotificationsEmailAddressAction(suiteId: number, formDa
       <SuiteNotificationsSetupEmail
         suiteId={data.suiteId}
         suiteName={dbSuite.name}
-        suiteDomain={dbSuite.domain}
         suiteNotificationsEmailAddress={dbSuite.notificationsEmailAddress}
       />
     ),

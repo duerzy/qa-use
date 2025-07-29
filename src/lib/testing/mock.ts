@@ -42,7 +42,6 @@ export const DOCS_FAILING_TEST_SEARCH_TEST: TestDefinition = createTest({
 
 export const BROWSERUSE_DOCS_TEST_SUITE: TestSuiteDefinition = {
   label: 'BrowserUse Docs',
-  domain: 'docs.browser-use.com',
   tests: [
     //
     DOCS_PASSING_SEARCH_TEST,

@@ -1,5 +1,5 @@
 {
-  "id": "6840acd0-cdec-46b7-b319-c5129d7ce4c9",
+  "id": "86c182e1-f8a0-4e45-bf2c-318bc3fcc602",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -27,11 +27,24 @@
           "notNull": true,
           "default": "now()"
         },
-        "domain": {
-          "name": "domain",
+        "cron_cadence": {
+          "name": "cron_cadence",
+          "type": "cron_cadence",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_cron_run_at": {
+          "name": "last_cron_run_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notifications_email_address": {
+          "name": "notifications_email_address",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -409,6 +422,14 @@
     }
   },
   "enums": {
+    "public.cron_cadence": {
+      "name": "cron_cadence",
+      "schema": "public",
+      "values": [
+        "hourly",
+        "daily"
+      ]
+    },
     "public.run_status": {
       "name": "run_status",
       "schema": "public",

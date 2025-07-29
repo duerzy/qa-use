@@ -8,6 +8,7 @@
 
 <p align="center">
   <img src="media/run.png" alt="Test Run in Progress" width="600px">
+  <img src="media/editor.png" alt="Test Run in Progress" width="600px">
 </p>
 
 ## 🚀 Quick Start Guide
@@ -39,7 +40,6 @@ docker compose up
 1. 🎯 **Advanced Test Management** - Organize tests into suites and run multiple tests in parallel.
 1. ⏰ **Automated Scheduling & Monitoring** - Configure suites to run hourly or daily automatically.
 1. 📧 **Smart Notifications** - Get an email notification when a test suite fails.
-1. 🛡️ **Enterprise-Grade Security** - Restrict the tests to only run on your domain.
 
 🎉 **That's it!** Visit [http://localhost:3000](http://localhost:3000) to start creating your first test suite.
 
