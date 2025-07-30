@@ -1,4 +1,4 @@
-# 🎯 QA Use
+![qa use](/static/qa-use-banner.png)
 
 **AI-Powered E2E Testing Platform** ✨
 
