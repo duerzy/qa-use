@@ -33,6 +33,7 @@ export function SuiteDetails({
   createTest,
   setCronCadence,
   setNotificationsEmailAddress,
+  duplicateTest,
 }: {
   suite: TSuite
   runSuite: (formData: FormData) => Promise<void>
@@ -40,6 +41,7 @@ export function SuiteDetails({
   createTest: (formData: FormData) => Promise<void>
   setCronCadence: (cadence: 'hourly' | 'daily' | null, formData: FormData) => Promise<void>
   setNotificationsEmailAddress: (formData: FormData) => Promise<void>
+  duplicateTest: (testId: number, formData: FormData) => Promise<void>
 }) {
   const [_cadence, _setCadence] = useState<'hourly' | 'daily' | null>(suite.cronCadence)
 
@@ -90,7 +92,7 @@ export function SuiteDetails({
             actions={[<CreateTestDialog key="create-test-dialog" suiteId={suite.id} createTest={createTest} />]}
           />
 
-          <TestsTab suite={suite} suiteId={suite.id} />
+          <TestsTab suite={suite} suiteId={suite.id} duplicate={duplicateTest} />
         </div>
 
         <div className="col-span-1">
@@ -99,7 +101,7 @@ export function SuiteDetails({
             actions={[
               <form key="run-suite-form" action={runSuite}>
                 <Button type="submit" variant="outline">
-                  <Play className="w-4 h-4" />
+                  <Play className="size-4" />
                   Run Suite
                 </Button>
                 ,
@@ -181,7 +183,7 @@ function CreateTestDialog({ createTest }: { suiteId: number; createTest: (formDa
     <Dialog>
       <DialogTrigger asChild>
         <Button className="ml-auto" variant="outline">
-          <Plus className="w-4 h-4" />
+          <Plus className="size-4" />
           Create Test
         </Button>
       </DialogTrigger>

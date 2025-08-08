@@ -87,7 +87,7 @@ function CreateSuiteDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="ml-auto">
-          <Plus className="w-4 h-4" />
+          <Plus className="size-4" />
           Create Suite
         </Button>
       </DialogTrigger>
@@ -130,7 +130,7 @@ function ImportSuiteDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="ml-auto">
-          <Plus className="w-4 h-4" />
+          <Plus className="size-4" />
           Import Suite
         </Button>
       </DialogTrigger>

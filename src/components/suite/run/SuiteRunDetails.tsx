@@ -9,6 +9,7 @@ import { RunStatusIcon } from '@/components/shared/RunStatusIcon'
 import { SectionHeader } from '@/components/shared/SectionHeader'
 import { formatDate } from '@/components/shared/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { DeepRequired } from '@/lib/types'
 
 export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
   const { nOfPassingTests, nOfFailedTests } = useMemo(() => {
@@ -21,6 +22,19 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
       { nOfPassingTests: 0, nOfFailedTests: 0 },
     )
   }, [run.testRuns])
+
+  const liveViews = useMemo(
+    () =>
+      run.testRuns
+        .map((testRun) => ({
+          id: testRun.id,
+          label: testRun.test.label,
+          status: testRun.status,
+          liveUrl: testRun.liveUrl,
+        }))
+        .filter((testRun): testRun is DeepRequired<typeof testRun> => testRun.liveUrl != null),
+    [run.testRuns],
+  )
 
   return (
     <Fragment>
@@ -70,6 +84,25 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
           ))}
         </TableBody>
       </Table>
+
+      <SectionHeader title="Live View" actions={[]} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {liveViews.map((liveView) => (
+          <Link
+            key={liveView.id}
+            href={`/suite/${run.suite.id}/test/${liveView.id}/run/${liveView.id}`}
+            className="block col-span-1 w-full relative border border-gray-300 rounded-xs overflow-hidden"
+          >
+            <iframe src={liveView.liveUrl} className="w-full h-auto" style={{ aspectRatio: '1280/1050' }} />
+
+            <div className="absolute bottom-0 right-0 p-2 bg-white flex items-center gap-2 rounded-tl-xs">
+              <RunStatusIcon status={liveView.status} />
+              <span className="text-sm font-medium">{liveView.label}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
 
       <Polling poll={run.status === 'running' || run.status === 'pending'} />
     </Fragment>

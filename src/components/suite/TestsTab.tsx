@@ -1,22 +1,32 @@
 'use client'
 
+import { CopyPlus } from 'lucide-react'
 import Link from 'next/link'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import type { TSuite } from '../../app/suite/[suiteId]/loader'
-import { formatDate } from '../shared/utils'
+import { Button } from '../ui/button'
 
 /**
  * Shows a list of tests in a suite.
  */
-export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number }) {
+export function TestsTab({
+  suite,
+  suiteId,
+
+  duplicate,
+}: {
+  suite: TSuite
+  suiteId: number
+
+  duplicate: (testId: number, formData: FormData) => void
+}) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Test</TableHead>
-          <TableHead>Created At</TableHead>
           <TableHead>{/* Actions */}</TableHead>
         </TableRow>
       </TableHeader>
@@ -30,15 +40,35 @@ export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number })
         )}
 
         {suite.tests.map((test) => (
-          <TableRow key={test.id}>
-            <TableCell>{test.label}</TableCell>
-            <TableCell suppressHydrationWarning>{formatDate(test.createdAt)}</TableCell>
-            <TableCell className="text-right">
-              <Link href={`/suite/${suiteId}/test/${test.id}`}>View</Link>
-            </TableCell>
-          </TableRow>
+          <TestRow key={test.id} test={test} suiteId={suiteId} duplicate={duplicate} />
         ))}
       </TableBody>
     </Table>
+  )
+}
+
+const TestRow = ({
+  test,
+  suiteId,
+  duplicate,
+}: {
+  test: TSuite['tests'][number]
+  suiteId: number
+  duplicate: (testId: number, formData: FormData) => void
+}) => {
+  const action = duplicate.bind(null, test.id)
+
+  return (
+    <TableRow key={test.id}>
+      <TableCell>{test.label}</TableCell>
+      <TableCell className="text-right flex justify-end gap-1">
+        <form action={action}>
+          <Button variant="ghost" type="submit" className="-my-2">
+            <CopyPlus className="size-3.5" />
+          </Button>
+        </form>
+        <Link href={`/suite/${suiteId}/test/${test.id}`}>View</Link>
+      </TableCell>
+    </TableRow>
   )
 }

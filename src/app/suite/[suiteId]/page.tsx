@@ -5,6 +5,7 @@ import { SuiteDetails } from '@/components/suite/SuiteDetails'
 import {
   createTestAction,
   deleteSuiteAction,
+  duplicateTestAction,
   runSuiteAction,
   setCronCadenceAction,
   setNotificationsEmailAddressAction,
@@ -31,6 +32,7 @@ export default async function SuitePage({ params }: { params: Promise<{ suiteId:
   const createTest = createTestAction.bind(null, suiteIdNum)
   const setCronCadence = setCronCadenceAction.bind(null, suiteIdNum)
   const setNotificationsEmailAddress = setNotificationsEmailAddressAction.bind(null, suiteIdNum)
+  const duplicateTest = duplicateTestAction.bind(null, suiteIdNum)
 
   return (
     <SuiteDetails
@@ -40,6 +42,7 @@ export default async function SuitePage({ params }: { params: Promise<{ suiteId:
       createTest={createTest}
       setCronCadence={setCronCadence}
       setNotificationsEmailAddress={setNotificationsEmailAddress}
+      duplicateTest={duplicateTest}
     />
   )
 }

@@ -193,3 +193,39 @@ export async function setNotificationsEmailAddressAction(suiteId: number, formDa
   revalidatePath(`/suite/${data.suiteId}`)
   redirect(`/suite/${data.suiteId}`, RedirectType.push)
 }
+
+export async function duplicateTestAction(suiteId: number, testId: number, _form: FormData) {
+  const test = await db.query.test.findFirst({
+    where: eq(schema.test.id, testId),
+    with: {
+      steps: true,
+    },
+  })
+
+  if (!test) {
+    throw new Error(`Test not found: ${testId}`)
+  }
+
+  const _ = await db.transaction(async (tx) => {
+    const [newTest] = await tx
+      .insert(schema.test)
+      .values({
+        label: `${test.label} (Copy)`,
+        evaluation: test.evaluation,
+        suiteId: suiteId,
+      })
+      .returning()
+
+    await tx.insert(schema.testStep).values(
+      test.steps.map((step) => ({
+        testId: newTest.id,
+        description: step.description,
+        order: step.order,
+      })),
+    )
+
+    return newTest
+  })
+
+  revalidatePath(`/suite/${suiteId}`)
+}
