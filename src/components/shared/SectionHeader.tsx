@@ -11,7 +11,7 @@ export function SectionHeader({
   actions: React.ReactNode[]
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-3">
+    <div className="flex items-center gap-3 py-3">
       <div className="flex flex-col gap-1 mr-auto">
         <SectionHeaderTitle title={title} />
         {subtitle && <SectionHeaderSubtitle subtitle={subtitle} />}

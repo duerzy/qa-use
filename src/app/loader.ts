@@ -10,7 +10,13 @@ const MOCK_SUITE: TestSuiteDefinition = BROWSERUSE_DOCS_TEST_SUITE
 export async function loader() {
   const suites = await db.query.suite.findMany({
     orderBy: [desc(schema.suite.createdAt)],
-    with: { tests: true },
+    with: {
+      tests: true,
+      runs: {
+        orderBy: [desc(schema.suiteRun.createdAt)],
+        limit: 1,
+      },
+    },
   })
 
   // NOTE: We always seed the mock suite to make sure you can see something!
@@ -51,7 +57,13 @@ export async function loader() {
 
     return await db.query.suite.findMany({
       orderBy: [desc(schema.suite.createdAt)],
-      with: { tests: true },
+      with: {
+        tests: true,
+        runs: {
+          orderBy: [desc(schema.suiteRun.createdAt)],
+          limit: 1,
+        },
+      },
     })
   }
 

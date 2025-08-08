@@ -44,7 +44,7 @@ export function SuiteRunDetails({ run }: { run: TSuiteRun }) {
         <TableHeader>
           <TableRow>
             <TableHead>Test</TableHead>
-            <TableHead>Created At</TableHead>
+            <TableHead>Ran At</TableHead>
             <TableHead>{/* Actions */}</TableHead>
           </TableRow>
         </TableHeader>

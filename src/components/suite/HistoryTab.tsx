@@ -15,7 +15,7 @@ export function HistoryTab({ suite }: { suite: TSuite }) {
         <TableRow>
           <TableHead>Status</TableHead>
           <TableHead>Run</TableHead>
-          <TableHead>Created At</TableHead>
+          <TableHead>Performed At</TableHead>
           <TableHead>{/* Actions */}</TableHead>
         </TableRow>
       </TableHeader>

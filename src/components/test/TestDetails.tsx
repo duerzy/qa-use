@@ -110,7 +110,7 @@ export function TestDetails({
             <TableHeader>
               <TableRow>
                 <TableHead>Run</TableHead>
-                <TableHead>Created At</TableHead>
+                <TableHead>Performed At</TableHead>
                 <TableHead>{/* Actions */}</TableHead>
               </TableRow>
             </TableHeader>

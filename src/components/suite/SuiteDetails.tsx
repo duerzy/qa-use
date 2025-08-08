@@ -73,8 +73,13 @@ export function SuiteDetails({
     <Fragment>
       <PageHeader
         title={suite.name}
-        subtitle={`${suite.tests.length} tests`}
         back={{ href: '/', label: 'All Suites' }}
+        actions={[
+          {
+            label: 'Export Suite',
+            link: `/api/export/${suite.id}`,
+          },
+        ]}
       />
 
       {/* Body with Tabs */}
@@ -97,6 +102,7 @@ export function SuiteDetails({
                   <Play className="w-4 h-4" />
                   Run Suite
                 </Button>
+                ,
               </form>,
             ]}
           />
@@ -104,7 +110,7 @@ export function SuiteDetails({
         </div>
       </div>
 
-      <div className="mt-9" />
+      <div className="my-9 h-px bg-gray-200 w-full" />
 
       <SectionHeader
         title="Settings"

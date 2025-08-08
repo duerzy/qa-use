@@ -7,6 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { TSuite } from '../../app/suite/[suiteId]/loader'
 import { formatDate } from '../shared/utils'
 
+/**
+ * Shows a list of tests in a suite.
+ */
 export function TestsTab({ suite, suiteId }: { suite: TSuite; suiteId: number }) {
   return (
     <Table>

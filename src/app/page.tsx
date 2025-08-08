@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { createSuiteAction } from './actions'
+import { createSuiteAction, importSuiteAction } from './actions'
 import { loader, type TSuite } from './loader'
 
 export const dynamic = 'force-dynamic'
@@ -36,14 +36,21 @@ export default async function Page() {
 
       {/* Suites List */}
 
-      <SectionHeader title="Test Suites" actions={[<CreateSuiteDialog key="create-suite-dialog" />]} />
+      <SectionHeader
+        title="Test Suites"
+        actions={[
+          //
+          <CreateSuiteDialog key="create-suite-dialog" />,
+          <ImportSuiteDialog key="import-suite-dialog" />,
+        ]}
+      />
 
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Tests</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>Created At</TableHead>
             <TableHead>Cron</TableHead>
             <TableHead>Last Run</TableHead>
             <TableHead>{/* Actions */}</TableHead>
@@ -63,7 +70,7 @@ export default async function Page() {
               <TableCell>{suite.tests.length} tests</TableCell>
               <TableCell>{formatDate(suite.createdAt)}</TableCell>
               <TableCell>{getCronLabel(suite.cronCadence)}</TableCell>
-              <TableCell>{suite.lastCronRunAt ? formatDate(suite.lastCronRunAt) : 'Never'}</TableCell>
+              <TableCell>{getLastRunLabel(suite)}</TableCell>
               <TableCell className="text-right">
                 <Link href={`/suite/${suite.id}`}>View</Link>
               </TableCell>
@@ -116,4 +123,44 @@ function getCronLabel(cronCadence: TSuite['cronCadence']) {
     default:
       return 'Never'
   }
+}
+
+function ImportSuiteDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="ml-auto">
+          <Plus className="w-4 h-4" />
+          Import Suite
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Import a test suite</DialogTitle>
+          <DialogDescription>Import a test suite from a JSON file.</DialogDescription>
+
+          <form action={importSuiteAction} className="space-y-4">
+            <div>
+              <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-1">
+                Suite File
+              </label>
+              <Input type="file" id="file" name="file" accept=".json" required />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button type="submit">Import</Button>
+            </div>
+          </form>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function getLastRunLabel(suite: { runs: { createdAt: Date }[] }) {
+  if (suite.runs.length === 0) {
+    return 'Never'
+  }
+
+  return formatDate(suite.runs[0].createdAt)
 }
