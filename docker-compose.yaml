@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmmirror.com}
     env_file:
       - .env
     environment:
@@ -53,6 +55,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmmirror.com}
     command: pnpm drizzle-kit migrate --config ./drizzle.config.ts
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/qa-use

@@ -2,6 +2,11 @@ FROM node:23-alpine AS deps
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
+# Configure npm/pnpm to use a faster mirror (can be overridden by build arg)
+ARG NPM_REGISTRY=https://registry.npmmirror.com
+RUN npm config set registry ${NPM_REGISTRY} \
+  && pnpm config set registry ${NPM_REGISTRY}
+
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
@@ -11,6 +16,11 @@ RUN pnpm install --frozen-lockfile
 FROM node:23-alpine AS builder
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Keep registry in builder stage as well (in case any postinstall/fetch occurs)
+ARG NPM_REGISTRY=https://registry.npmmirror.com
+RUN npm config set registry ${NPM_REGISTRY} \
+  && pnpm config set registry ${NPM_REGISTRY}
 
 WORKDIR /app
 
@@ -24,6 +34,11 @@ RUN pnpm build
 FROM node:23-alpine AS runner
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Keep registry config for runtime installs (if any)
+ARG NPM_REGISTRY=https://registry.npmmirror.com
+RUN npm config set registry ${NPM_REGISTRY} \
+  && pnpm config set registry ${NPM_REGISTRY}
 
 WORKDIR /app
 ENV NODE_ENV=production
