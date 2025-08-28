@@ -17,6 +17,7 @@
 
 - 🐳 **Docker** & Docker Compose installed
 - 🔑 **BrowserUse API Key** (get yours at [cloud.browser-use.com](https://cloud.browser-use.com/billing))
+- **(Optional) local browser use api server** (get at [github.com/duerzy/browser-use-local-api](https://github.com/duerzy/browser-use-local-api))
 - 📧 **Resend API Key** (optional, for email notifications)
 
 ### ⚡ 3-Step Setup
@@ -29,6 +30,7 @@ cd qa-use
 # 2️⃣ Configure environment variables
 cp .env.example .env
 # Edit .env and add your API keys
+# Set NODE_ENV to 'local' to use local API
 
 # 3️⃣ Launch the platform
 docker compose up
